@@ -52,5 +52,11 @@ export default defineComponent({
     });
     return { mainContentClass, showHeader, showSidebar };
   },
+  created() {
+    const isAuthenticated = !!localStorage.getItem('jwt');
+    if (isAuthenticated) {
+      this.$router.push({ name: 'HomePage' });
+    }
+  }
 });
 </script>

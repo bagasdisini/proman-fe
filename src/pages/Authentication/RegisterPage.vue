@@ -6,13 +6,15 @@
           <h4 class="text-black fw-bold mb-0 text-center">
             Create Your Account
           </h4>
-          <form>
+          <form @submit.prevent="handleSubmit">
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
               <label class="d-block text-black fw-semibold mb-10">Name</label>
               <input
                   type="text"
                   class="form-control shadow-none rounded-0 text-black"
                   placeholder="e.g. Jacob Adam"
+                  v-model="name"
+                  required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -23,6 +25,8 @@
                   type="email"
                   class="form-control shadow-none rounded-0 text-black"
                   placeholder="e.g. adam127704@gmail.com"
+                  v-model="email"
+                  required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -33,6 +37,8 @@
                   type="password"
                   class="form-control shadow-none rounded-0 text-black"
                   placeholder="**************"
+                  v-model="password"
+                  required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -43,6 +49,8 @@
                   type="password"
                   class="form-control shadow-none rounded-0 text-black"
                   placeholder="**************"
+                  v-model="confirmPassword"
+                  required
               />
             </div>
             <button
@@ -70,9 +78,49 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "RegisterPage",
+  setup() {
+    const name = ref("");
+    const email = ref("");
+    const password = ref("");
+    const confirmPassword = ref("");
+    const router = useRouter();
+
+    const handleSubmit = async () => {
+      if (password.value !== confirmPassword.value) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      try {
+        const response = await axios.post('http://localhost:5000/api/register', {
+          name: name.value,
+          email: email.value,
+          password: password.value,
+          confirm_password: confirmPassword.value
+        });
+
+        if (response.status === 200) {
+          alert("Registration successful!");
+          await router.push({name: "LoginPage"});
+        }
+      } catch (error) {
+        console.error("Error during registration:", error);
+      }
+    };
+
+    return {
+      name,
+      email,
+      password,
+      confirmPassword,
+      handleSubmit,
+    };
+  },
 });
 </script>

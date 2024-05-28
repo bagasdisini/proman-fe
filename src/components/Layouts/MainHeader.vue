@@ -93,6 +93,7 @@
                   <router-link
                     to="/"
                     class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
+                    @click="handleLogout"
                   ></router-link>
                 </li>
               </ul>
@@ -106,6 +107,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import stateStore from "../../utils/store";
 
 export default defineComponent({
@@ -113,6 +115,7 @@ export default defineComponent({
   setup() {
     const stateStoreInstance = stateStore;
     const isSticky = ref(false);
+    const router = useRouter();
 
     onMounted(() => {
       window.addEventListener("scroll", () => {
@@ -121,9 +124,15 @@ export default defineComponent({
       });
     });
 
+    const handleLogout = () => {
+      localStorage.removeItem('jwt');
+      router.push({ name: 'LoginPage' });
+    };
+
     return {
       isSticky,
       stateStoreInstance,
+      handleLogout,
     };
   },
 });

@@ -8,7 +8,7 @@
             Enter your email address below and we will send you the recovered
             password
           </p>
-          <form>
+          <form @submit.prevent="handleSubmit">
             <div class="form-group mb-15 mb-sm-20">
               <label class="d-block text-black fw-semibold mb-10">
                 Email Address
@@ -17,6 +17,8 @@
                   type="email"
                   class="form-control shadow-none rounded-0 text-black"
                   placeholder="e.g. adam127704@gmail.com"
+                  v-model="email"
+                  required
               />
             </div>
             <button
@@ -42,9 +44,35 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {defineComponent, ref} from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ForgotPasswordPage",
+  setup() {
+    const email = ref("");
+    const router = useRouter();
+
+    const handleSubmit = async () => {
+        try {
+        const response = await axios.post('http://localhost:5000/api/forgot-password', {
+          email: email.value,
+        });
+
+        if (response.status === 200) {
+          alert("Please check your email!");
+          await router.push({name: "LoginPage"});
+        }
+      } catch (error) {
+        console.error("Error during forgot password:", error);
+      }
+    };
+
+    return {
+      email,
+      handleSubmit,
+    };
+  },
 });
 </script>
