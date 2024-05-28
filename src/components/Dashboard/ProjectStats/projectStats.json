@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "image": "projects/project-mini1.jpg",
+    "title": "Dashboard Design",
+    "type": "Web Design",
+    "startDate": "01 Mar 2024",
+    "dueDate": "20 Aug 2024",
+    "progress": "80",
+    "class": "text-outline-primary",
+    "status": "In Process",
+    "chartImage": "chart/chart1.png"
+  },
+  {
+    "id": 2,
+    "image": "projects/project-mini2.jpg",
+    "title": "CRM Dashboard Design",
+    "type": "Web Design",
+    "startDate": "01 Mar 2024",
+    "dueDate": "04 Mei 2024",
+    "progress": "25",
+    "class": "text-outline-danger",
+    "status": "On Hold",
+    "chartImage": "chart/chart2.png"
+  },
+  {
+    "id": 3,
+    "image": "projects/project-mini3.jpg",
+    "title": "Agency Design",
+    "type": "Web Design",
+    "startDate": "01 Mar 2024",
+    "dueDate": "05 Jun 2024",
+    "progress": "100",
+    "class": "text-outline-success",
+    "status": "Completed",
+    "chartImage": "chart/chart3.png"
+  },
+  {
+    "id": 4,
+    "image": "projects/project-mini4.jpg",
+    "title": "Dashboard Design",
+    "type": "Web Design",
+    "startDate": "01 Mar 2024",
+    "dueDate": "20 Aug 2024",
+    "progress": "40",
+    "class": "text-outline-primary",
+    "status": "In Process",
+    "chartImage": "chart/chart4.png"
+  },
+  {
+    "id": 5,
+    "image": "projects/project-mini5.jpg",
+    "title": "App Design",
+    "type": "Web Design",
+    "startDate": "01 Mar 2024",
+    "dueDate": "10 Sep 2024",
+    "progress": "55",
+    "class": "text-outline-success",
+    "status": "Completed",
+    "chartImage": "chart/chart5.png"
+  }
+]
