@@ -50,15 +50,15 @@
               aria-expanded="false"
             >
               <img
-                src="../../assets/images/admin.jpg"
+                :src="userAvatar"
                 class="rounded"
                 width="44"
                 height="44"
                 alt="admin"
               />
               <span class="title d-none d-lg-block ms-10 ms-lg-15">
-                <span class="d-block fw-bold mb-5 mb-md-8">Muhammad Bagas Sudibyo</span>
-                <span class="text-body-emphasis fw-semibold fs-13">Backend Engineer</span>
+                <span class="d-block fw-bold mb-5 mb-md-8">{{ userName }}</span>
+                <span class="text-body-emphasis fw-semibold fs-13">{{ userPosition }}</span>
               </span>
             </button>
             <div
@@ -109,29 +109,53 @@
 import { defineComponent, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import stateStore from "../../utils/store";
+import { API, setAuthToken } from "@/api";
 
 export default defineComponent({
   name: "MainHeader",
   setup() {
     const stateStoreInstance = stateStore;
     const isSticky = ref(false);
+    const userName = ref("");
+    const userPosition = ref("");
+    const userAvatar = ref("");
     const router = useRouter();
+
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+          const response = await API.get("/me");
+          userName.value = response.data.name;
+          userPosition.value = response.data.position ;
+          userAvatar.value = response.data.avatar;
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
     onMounted(() => {
       window.addEventListener("scroll", () => {
         let scrollPos = window.scrollY;
         isSticky.value = scrollPos >= 100;
       });
+      fetchUserData();
     });
 
     const handleLogout = () => {
-      localStorage.removeItem('jwt');
-      router.push({ name: 'LoginPage' });
+      localStorage.removeItem("jwt");
+      setAuthToken(null);
+      router.push({ name: "LoginPage" });
     };
 
     return {
       isSticky,
       stateStoreInstance,
+      userName,
+      userPosition,
+      userAvatar,
       handleLogout,
     };
   },

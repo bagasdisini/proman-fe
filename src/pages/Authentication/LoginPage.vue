@@ -67,26 +67,29 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import axios from "axios";
+import { API, setAuthToken } from "@/api";
 
 export default defineComponent({
   name: "LoginPage",
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
     };
   },
   methods: {
     async handleSubmit() {
       try {
-        const response = await axios.post('http://localhost:5000/api/login', {
+        const response = await API.post("/login", {
           email: this.email,
           password: this.password
         });
+
         const token = response.data.token;
-        localStorage.setItem('jwt', token);
-        this.$router.push({ name: 'HomePage' });
+        localStorage.setItem("jwt", token);
+        setAuthToken(token);
+
+        this.$router.push({ name: "HomePage" });
       } catch (error) {
         console.error("Error logging in:", error);
       }
