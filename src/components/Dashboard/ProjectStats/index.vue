@@ -101,6 +101,37 @@
           </tbody>
         </table>
       </div>
+      <div
+        class="pagination-area d-md-flex mt-15 mt-md-25 mb-0 justify-content-between align-items-center"
+      >
+        <p class="mb-0 text-paragraph">
+          Showing <span class="fw-bold">11</span> out of
+          <span class="fw-bold">134</span> results
+        </p>
+        <nav class="mt-15 mt-md-0">
+          <ul class="pagination mb-0">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous">
+                <i class="flaticon-chevron-1"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link active" href="#">1</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">3</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next">
+                <i class="flaticon-chevron"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 </template>

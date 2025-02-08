@@ -27,7 +27,7 @@ import TaskOverview from "../../components/Dashboard/TaskOverview.vue";
 import ProjectDistribution from "../../components/Dashboard/ProjectDistribution.vue";
 import WorkingSchedule from "../../components/Dashboard/WorkingSchedule/index.vue";
 import ProjectStats from "../../components/Dashboard/ProjectStats/index.vue";
-import ToDoList from "../../components/Dashboard/ToDoList/index.vue";
+import ToDoList from "../../components/Dashboard/ToDoList.vue";
 
 export default defineComponent({
   name: "HomePage",

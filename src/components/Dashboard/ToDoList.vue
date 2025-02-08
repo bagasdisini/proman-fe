@@ -24,22 +24,20 @@
       >
         <li
           class="to-do-list-item ps-8 pe-5 d-flex align-items-center justify-content-between"
-          v-for="list in lists"
-          :key="list.id"
+          v-for="task in sortedTasks"
+          :key="task._id"
         >
           <div
-            :class="[
-              'form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium',
-              list.class,
-            ]"
+            class="form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium"
           >
             <input
               class="form-check-input shadow-none"
               type="checkbox"
-              :id="'task' + list.id"
+              :id="'task' + task._id"
+              :checked="task.status === 'completed'"
             />
-            <label class="form-check-label" :for="'task' + list.id">
-              {{ list.label }}
+            <label class="form-check-label" :for="'task' + task._id">
+              {{ task.name }}
             </label>
           </div>
           <div class="dropdown">
@@ -382,54 +380,53 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import toDoList from "./toDoList.json";
-import LoaderComponent from "../../Layouts/Loader.vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
+import { API, setAuthToken } from "@/api";
+import LoaderComponent from "@/components/Layouts/Loader.vue";
 
 export default defineComponent({
   name: "ToDoList",
   components: {
     LoaderComponent,
   },
-  data() {
+  setup() {
     const isLoading = ref(true);
     const isLoaded = ref(false);
-    const search = ref("");
-    const availableOptions = [
-      "Muhammad",
-      "Bagas",
-      "Sudibyo",
-      "3122510602",
-    ];
-    const selected = ["Bagas"];
+    const tasks = ref<any[]>([]);
 
-    const fetchData = () => {
-      setTimeout(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+          const taskResponse = await API.get("/me/tasks");
+
+          if (taskResponse.data && Array.isArray(taskResponse.data)) {
+            tasks.value = taskResponse.data.filter((task) => task.status === "active");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
         isLoading.value = false;
         isLoaded.value = true;
-      }, 100);
+      }
     };
 
-    fetchData();
+    onMounted(fetchData);
+
+    const sortedTasks = computed(() => {
+      return [...tasks.value]
+        .sort((a, b) => {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+    });
+
     return {
-      lists: toDoList,
       isLoading,
       isLoaded,
-      search,
-      selected,
-      availableOptions,
+      sortedTasks,
     };
-  },
-  methods: {
-    addContributor() {
-      if (this.search) {
-        this.selected.push(this.search);
-        this.search = "";
-      }
-    },
-    removeContributor(index) {
-      this.selected.splice(index, 1);
-    },
   },
 });
 </script>

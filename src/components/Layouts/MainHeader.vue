@@ -58,7 +58,9 @@
               />
               <span class="title d-none d-lg-block ms-10 ms-lg-15">
                 <span class="d-block fw-bold mb-5 mb-md-8">{{ userName }}</span>
-                <span class="text-body-emphasis fw-semibold fs-13">{{ userPosition }}</span>
+                <span class="text-body-emphasis fw-semibold fs-13">{{
+                  userPosition
+                }}</span>
               </span>
             </button>
             <div
@@ -76,13 +78,13 @@
                   ></router-link>
                 </li>
                 <li
-                    class="text-body-secondary fw-semibold transition position-relative"
+                  class="text-body-secondary fw-semibold transition position-relative"
                 >
                   <i class="flaticon-setting"></i>
                   Change Password
                   <router-link
-                      to="/change-password"
-                      class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
+                    to="/change-password"
+                    class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
                   ></router-link>
                 </li>
                 <li
@@ -128,7 +130,7 @@ export default defineComponent({
           setAuthToken(token);
           const response = await API.get("/me");
           userName.value = response.data.name;
-          userPosition.value = response.data.position ;
+          userPosition.value = response.data.position;
           userAvatar.value = response.data.avatar;
         }
       } catch (error) {

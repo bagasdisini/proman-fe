@@ -6,10 +6,10 @@
       </div>
       <div id="taskOverviewChart" class="chart">
         <apexchart
-            type="bar"
-            height="370"
-            :options="taskOverviewChart"
-            :series="task"
+          type="bar"
+          height="370"
+          :options="taskOverviewChart"
+          :series="task"
         ></apexchart>
       </div>
     </div>
@@ -17,7 +17,8 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import { API, setAuthToken } from "@/api";
 
 interface TaskData {
   name: string;
@@ -26,101 +27,90 @@ interface TaskData {
 
 export default defineComponent({
   name: "TaskOverview",
-  data: function () {
-    return {
-      task: [] as TaskData[],
-      taskOverviewChart: {
-        chart: {
-          type: "bar",
-          height: 370,
-          toolbar: {
-            show: false,
-          },
-        },
-        plotOptions: {
-          bar: {
-            columnWidth: "24%",
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        colors: ["#6560F0"],
-        stroke: {
-          show: false,
-        },
-        xaxis: {
-          categories: [
-            "17 Dec - 23 Dec",
-            "28 Jan - 3 Feb",
-            "4 Feb - 10 Feb",
-            "11 Feb - 17 Feb",
-            "18 Feb - 24 Feb",
-            "25 Feb - 03 Mar",
-            "03 Mar - 09 Mar",
-            "10 Mar - 16 Mar",
-          ],
-          labels: {
-            show: true,
-            style: {
-              fontFamily: "Red Hat Display, sans-serif",
-              colors: "#9C9AB6",
-              fontSize: "14px",
-              fontWeight: 500,
-            },
-          },
-          axisTicks: {
-            show: false,
-          },
-          axisBorder: {
-            show: false,
-          },
-        },
-        yaxis: {
+  setup() {
+    const task = ref<TaskData[]>([]);
+    const categories = ref<string[]>([]);
+
+    const taskOverviewChart = ref({
+      chart: {
+        type: "bar",
+        height: 370,
+        toolbar: { show: false },
+      },
+      plotOptions: {
+        bar: { columnWidth: "24%" },
+      },
+      dataLabels: { enabled: false },
+      colors: ["#6560F0"],
+      stroke: { show: false },
+      xaxis: {
+        categories: categories.value,
+        labels: {
           show: true,
-          tickAmount: 6,
-          labels: {
-            show: true,
-            style: {
-              fontFamily: "Red Hat Display, sans-serif",
-              colors: ["#9C9AB6"],
-              fontSize: "14px",
-              fontWeight: 500,
-            },
-          },
-          axisBorder: {
-            show: true,
-            color: "#eee",
-          },
-        },
-        fill: {
-          opacity: 1,
-        },
-        tooltip: {
           style: {
-            fontSize: "14px",
             fontFamily: "Red Hat Display, sans-serif",
+            colors: "#9C9AB6",
+            fontSize: "14px",
+            fontWeight: 500,
           },
         },
-        grid: {
+        axisTicks: { show: false },
+        axisBorder: { show: false },
+      },
+      yaxis: {
+        show: true,
+        tickAmount: 10,
+        labels: {
           show: true,
-          strokeDashArray: 5,
-          borderColor: "#d9e9ef",
+          style: {
+            fontFamily: "Red Hat Display, sans-serif",
+            colors: ["#9C9AB6"],
+            fontSize: "14px",
+            fontWeight: 500,
+          },
+        },
+        axisBorder: { show: true, color: "#eee" },
+      },
+      fill: { opacity: 1 },
+      tooltip: {
+        style: {
+          fontSize: "14px",
+          fontFamily: "Red Hat Display, sans-serif",
+        },
+        y: {
+          formatter: (val: number) => Math.round(val),
         },
       },
+      grid: {
+        show: true,
+        strokeDashArray: 5,
+        borderColor: "#d9e9ef",
+      },
+    });
+
+    const fetchTaskOverview = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+        }
+
+        const response = await API.get("/me/task/overview");
+
+        categories.value = response.data.map((item: any) => `${item.start} - ${item.end}`);
+        const counts = response.data.map((item: any) => item.count);
+
+        task.value = [{ name: "This Week", data: counts }];
+
+        taskOverviewChart.value = { ...taskOverviewChart.value, xaxis: { ...taskOverviewChart.value.xaxis, categories: categories.value } };
+      } catch (error) {
+        console.error("Error fetching task overview:", error);
+      }
     };
-  },
-  mounted() {
-    // Simulate API call
-    setTimeout(() => {
-      // Fetch data from API
-      this.task = [
-        {
-          name: "This Week",
-          data: [250, 200, 1000, 150, 190, 350, 220, 180],
-        },
-      ];
-    }, 2000); // Assuming API call takes 2 seconds
+
+    onMounted(fetchTaskOverview);
+
+    return { task, taskOverviewChart };
   },
 });
 </script>

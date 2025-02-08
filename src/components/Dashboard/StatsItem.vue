@@ -25,10 +25,11 @@
               </div>
               <span class="d-block fw-medium text-dark-emphasis mt-5">
                 Total:
-                <span
-                  class="fw-bold"
-                  >{{ activeProjects.active+activeProjects.completed+activeProjects.pending }}</span
-                >
+                <span class="fw-bold">{{
+                  activeProjects.active +
+                  activeProjects.completed +
+                  activeProjects.pending
+                }}</span>
               </span>
             </div>
           </div>
@@ -37,10 +38,9 @@
           >
             <span class="fw-medium text-secondary">
               Completed:
-              <span
-                class="fw-bold text-black"
-                >{{ activeProjects.completed }}</span
-              >
+              <span class="fw-bold text-black">{{
+                activeProjects.completed
+              }}</span>
             </span>
             <span class="text-primary fw-semibold"
               >{{ completedPercentProject }}%</span
@@ -84,11 +84,12 @@
                 <h3 class="fw-black">{{ activeTasks.active }}</h3>
               </div>
               <span class="d-block fw-medium text-dark-emphasis mt-5">
-                 Total:
-                <span
-                  class="fw-bold"
-                  >{{ activeTasks.active+activeTasks.completed+activeTasks.testing }}</span
-                >
+                Total:
+                <span class="fw-bold">{{
+                  activeTasks.active +
+                  activeTasks.completed +
+                  activeTasks.testing
+                }}</span>
               </span>
             </div>
           </div>
@@ -97,9 +98,13 @@
           >
             <span class="fw-medium text-secondary">
               Completed:
-              <span class="fw-bold text-black">{{ activeTasks.completed }}</span>
+              <span class="fw-bold text-black">{{
+                activeTasks.completed
+              }}</span>
             </span>
-            <span class="text-success fw-semibold">{{ completedPercentTask }}%</span>
+            <span class="text-success fw-semibold"
+              >{{ completedPercentTask }}%</span
+            >
           </div>
           <div
             class="progress"
@@ -108,7 +113,7 @@
             aria-valuemin="0"
             aria-valuemax="100"
           >
-             <div
+            <div
               class="progress-bar bg-success"
               :style="{ width: completedPercentTask + '%' }"
             ></div>
@@ -134,61 +139,41 @@
             </div>
             <div class="title text-end">
               <span class="d-block fw-bold text-dark-emphasis mb-5">
-                Total Members
+                Working Members
               </span>
               <div class="d-flex align-items-center justify-content-end">
-                <h3 class="fw-black mb-0">{{ totalMembers.total }}</h3>
+                <h3 class="fw-black">{{ totalMembers.working }}</h3>
               </div>
               <span class="d-block fw-medium text-dark-emphasis mt-5">
-                Working:
-                <span class="fw-bold">{{ totalMembers.working }}</span>
+                Total:
+                <span class="fw-bold">{{ totalMembers.total }}</span>
               </span>
             </div>
           </div>
-          <div class="mt-15 mt-md-20 users-list d-flex align-items-center">
-            <div class="rounded-circle text-center">
-              <img
-                src="../../assets/images/user/user1.jpg"
-                class="rounded-circle"
-                alt="user"
-              />
-            </div>
-            <div class="rounded-circle text-center">
-              <img
-                src="../../assets/images/user/user2.jpg"
-                class="rounded-circle"
-                alt="user"
-              />
-            </div>
-            <div
-              class="rounded-circle bg-primary-emphasis text-center d-flex align-items-center justify-content-center text-white fs-16 fw-bold"
+          <div
+            class="mt-15 mt-md-25 mb-5 mb-md-8 d-flex justify-content-between align-items-center"
+          >
+            <span class="fw-medium text-secondary">
+              Working:
+              <span class="fw-bold text-black">{{
+                totalMembers.working
+              }}</span>
+            </span>
+            <span class="text-success fw-semibold"
+              >{{ completedPercentMember }}%</span
             >
-              P
-            </div>
-            <div class="rounded-circle text-center">
-              <img
-                src="../../assets/images/user/user4.jpg"
-                class="rounded-circle"
-                alt="user"
-              />
-            </div>
+          </div>
+          <div
+            class="progress"
+            role="progressbar"
+            aria-valuenow="42"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
             <div
-              class="rounded-circle bg-primary text-center d-flex align-items-center justify-content-center text-white fs-16 fw-bold"
-            >
-              S
-            </div>
-            <div class="rounded-circle text-center">
-              <img
-                src="../../assets/images/user/user3.jpg"
-                class="rounded-circle"
-                alt="user"
-              />
-            </div>
-            <div
-              class="rounded-circle bg-secondary text-center d-flex align-items-center justify-content-center text-white fs-14 fw-bold"
-            >
-              +24
-            </div>
+              class="progress-bar bg-orange"
+              :style="{ width: completedPercentMember + '%' }"
+            ></div>
           </div>
         </div>
       </div>
@@ -197,7 +182,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { API, setAuthToken } from "@/api";
 import LoaderComponent from "../Layouts/Loader.vue";
 
@@ -216,65 +201,87 @@ export default defineComponent({
     const fetchData = async () => {
       const startTime = performance.now();
 
-    try {
-      const token = localStorage.getItem("jwt");
-      if (token) {
-        setAuthToken(token);
-        const projectResponse = await API.get("/me/project/count");
-        const taskResponse = await API.get("/me/task/count");
-        const memberResponse = await API.get("/user/count");
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+          const projectResponse = await API.get("/me/project/count");
+          const taskResponse = await API.get("/me/task/count");
+          const memberResponse = await API.get("/user/count");
 
-        activeProjects.value = {
-          total: projectResponse.data.total,
-          completed: projectResponse.data.completed,
-          pending: projectResponse.data.pending,
-          active: projectResponse.data.active,
-        };
+          activeProjects.value = {
+            total: projectResponse.data.total,
+            completed: projectResponse.data.completed,
+            pending: projectResponse.data.pending,
+            active: projectResponse.data.active,
+          };
 
-        activeTasks.value = {
-          total: taskResponse.data.total,
-          completed: taskResponse.data.completed,
-          testing: taskResponse.data.testing,
-          active: taskResponse.data.active,
-        };
+          activeTasks.value = {
+            total: taskResponse.data.total,
+            completed: taskResponse.data.completed,
+            testing: taskResponse.data.testing,
+            active: taskResponse.data.active,
+          };
 
-        totalMembers.value = {
-          total: memberResponse.data.total,
-          working: memberResponse.data.have_task,
-        };
+          totalMembers.value = {
+            total: memberResponse.data.total,
+            working: memberResponse.data.have_task,
+          };
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
 
-    const endTime = performance.now();
-    const requestDuration = endTime - startTime;
+      const endTime = performance.now();
+      const requestDuration = endTime - startTime;
 
-    const minDelay = 100;
-    const remainingTime = Math.max(minDelay - requestDuration, 0);
+      const minDelay = 100;
+      const remainingTime = Math.max(minDelay - requestDuration, 0);
 
-    setTimeout(() => {
-      isLoading.value = false;
-      isLoaded.value = true;
-    }, remainingTime);
+      setTimeout(() => {
+        isLoading.value = false;
+        isLoaded.value = true;
+      }, remainingTime);
     };
 
-    onMounted(() => {
-      fetchData();
-    });
-
     const completedPercentProject = computed(() => {
-      const total = activeProjects.value.active + activeProjects.value.completed + activeProjects.value.pending;
-      return total > 0 ? ((activeProjects.value.completed / total) * 100).toFixed(0) : 0;
+      const total =
+        activeProjects.value.active +
+        activeProjects.value.completed +
+        activeProjects.value.pending;
+      return total > 0
+        ? ((activeProjects.value.completed / total) * 100).toFixed(0)
+        : 0;
     });
 
     const completedPercentTask = computed(() => {
-      const total = activeTasks.value.active + activeTasks.value.completed + activeTasks.value.testing;
-      return total > 0 ? ((activeTasks.value.completed / total) * 100).toFixed(0) : 0;
+      const total =
+        activeTasks.value.active +
+        activeTasks.value.completed +
+        activeTasks.value.testing;
+      return total > 0
+        ? ((activeTasks.value.completed / total) * 100).toFixed(0)
+        : 0;
+    });
+
+    const completedPercentMember = computed(() => {
+      const total = totalMembers.value.total;
+      return total > 0
+        ? ((totalMembers.value.working / total) * 100).toFixed(0)
+        : 0;
     });
 
     fetchData();
-    return { activeProjects, activeTasks, totalMembers, isLoading, isLoaded, completedPercentProject, completedPercentTask };
+    return {
+      activeProjects,
+      activeTasks,
+      totalMembers,
+      isLoading,
+      isLoaded,
+      completedPercentProject,
+      completedPercentTask,
+      completedPercentMember,
+    };
   },
 });
 </script>
