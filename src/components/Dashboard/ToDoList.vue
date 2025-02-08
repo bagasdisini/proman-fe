@@ -17,11 +17,15 @@
         </span>
       </div>
 
+
       <loader-component v-if="isLoading" style="margin: 35% auto" />
       <ul
         class="to-do-list ps-0 list-unstyled mb-0 custom-card-todo"
         v-if="isLoaded"
       >
+              <div v-if="sortedTasks.length === 0" class="text-center text-muted fw-bold text-dark-emphasis" style="font-size: medium; margin:auto">
+    Congratulations! You've unlocked the rare 'Do Nothing' achievement. 🎉
+  </div>
         <li
           class="to-do-list-item ps-8 pe-5 d-flex align-items-center justify-content-between"
           v-for="task in sortedTasks"

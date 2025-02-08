@@ -2,7 +2,7 @@
   <div class="mb-25 border-0 rounded-0 bg-white working-schedule-box">
     <div
       class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
-      :style="{ height: isLoaded ? 'auto' : '915px' }"
+      :style="{ height: isLoaded ? '915px' : '915px' }"
     >
       <div class="mb-15 d-sm-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Working Schedule</h5>
@@ -34,68 +34,24 @@
           Add A Schedule
         </span>
       </div>
+        <div v-if="schedules.length === 0" class="text-center text-muted fw-bold text-dark-emphasis" style="font-size: medium; margin: 60% auto">
+    Looks like your schedule took a day off. Enjoy the free time! 🏖️
+  </div>
       <loader-component v-if="isLoading" style="margin: 60% auto" />
-      <ul v-if="isLoaded" class="info-list ps-0 mb-0 list-unstyled">
-        <li class="d-inline-block">
-          <div class="d-flex align-items-center">
-            <span
-              class="d-block w-10 h-10 bg-primary rounded-circle me-8"
-            ></span>
-            <span class="fw-bold">
-              2
-              <span class="text-muted fw-semibold">Meetings</span>
-            </span>
-          </div>
-        </li>
-        <li class="d-inline-block">
-          <div class="d-flex align-items-center">
-            <span
-              class="d-block w-10 h-10 bg-success rounded-circle me-8"
-            ></span>
-            <span class="fw-bold">
-              2
-              <span class="text-muted fw-semibold">Discussion</span>
-            </span>
-          </div>
-        </li>
-        <li class="d-inline-block">
-          <div class="d-flex align-items-center">
-            <span class="d-block w-10 h-10 bg-info rounded-circle me-8"></span>
-            <span class="fw-bold">
-              2
-              <span class="text-muted fw-semibold">Reviews</span>
-            </span>
-          </div>
-        </li>
-      </ul>
-      <div
-        v-if="isLoaded"
-        class="schedule-list mt-15 mt-md-20 custom-card-work-schedule"
-      >
-        <div
-          v-for="schedule in schedules"
-          :key="schedule.id"
-          :class="[
-            'list-item pt-15 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center',
-            schedule.bgClass,
-          ]"
-        >
-          <div class="content">
-            <div class="d-flex align-items-center mb-5">
-              <h6 class="fw-medium mb-0">
-                {{ schedule.time }}
-              </h6>
-            </div>
-            <span class="d-block text-black fw-semibold fs-md-15 mb-1">
-              {{ schedule.title }}
-            </span>
-            <span class="d-block text-muted fs-12 fw-medium">
-              Lead by
-              <span :class="schedule.class">{{ schedule.leadBy }}</span>
-            </span>
-          </div>
-        </div>
+      <div v-if="isLoaded" class="schedule-list mt-15 mt-md-20 custom-card-work-schedule">
+<div v-if="schedules.length === 0">
+  </div>
+  <div v-else v-for="schedule in schedules" :key="schedule.id"
+    class="list-item pt-15 bg-f2f1f9 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center">
+    <div class="content">
+      <div class="d-flex align-items-center mb-5">
+        <h6 class="fw-medium mb-0">{{ schedule.start_time }} - {{ schedule.end_time }}</h6>
       </div>
+      <span class="d-block text-black fw-semibold fs-md-15 mb-1">{{ schedule.name }}</span>
+      <span class="d-block text-muted fs-12 fw-medium">{{ schedule.contributor.join(", ") }}</span>
+    </div>
+  </div>
+</div>
     </div>
   </div>
   <div
@@ -234,15 +190,15 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import workingSchedule from "./workingSchedule.json";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
+import { API, setAuthToken } from "@/api";
 
 export default defineComponent({
   name: "WorkingSchedule",
   components: {
     LoaderComponent,
   },
-  data() {
+  setup() {
     const isLoading = ref(true);
     const isLoaded = ref(false);
     const search = ref("");
@@ -253,27 +209,62 @@ export default defineComponent({
       "3122510602",
     ];
     const selected = ["Bagas"];
+    let schedules = ref([]);
+    let scheduleCounts = ref({});
 
-    const fetchData = () => {
+    const fetchSchedules = async () => {
+      const startTime = performance.now();
+
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+
+          const start = new Date();
+          start.setHours(0, 0, 0, 0);
+          const end = new Date();
+          end.setHours(23, 59, 59, 999);
+
+          const response = await API.get(`/me/schedules`); // ?start=${start.getTime()}&end=${end.getTime()}
+
+          if (response.data) {
+            let fetchedSchedules = response.data
+              .map(schedule => ({
+                id: schedule.id,
+                name: schedule.name,
+                contributor: schedule.contributor,
+                start_time: schedule.start_time,
+                end_time: schedule.end_time,
+                type: schedule.type,
+              }))
+              .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+            const counts = fetchedSchedules.reduce((acc, schedule) => {
+              acc[schedule.type] = (acc[schedule.type] || 0) + 1;
+              return acc;
+            }, {});
+
+            schedules.value = fetchedSchedules;
+            scheduleCounts.value = counts;
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching schedules:", error);
+      }
+
+      const endTime = performance.now();
+      const requestDuration = endTime - startTime;
+
+      const minDelay = 100;
+      const remainingTime = Math.max(minDelay - requestDuration, 0);
+
       setTimeout(() => {
         isLoading.value = false;
         isLoaded.value = true;
-      }, 100);
-    };
+      }, remainingTime);
+    }
 
-    fetchData();
-    return {
-      schedules: workingSchedule,
-      dates: this.getDates(),
-      isLoading,
-      isLoaded,
-      search,
-      selected,
-      availableOptions,
-    };
-  },
-  methods: {
-    getDates() {
+    const getDates = () => {
       const now = new Date();
       let dates: Date[] = [];
       for (let i = -3; i <= 3; i++) {
@@ -282,7 +273,21 @@ export default defineComponent({
         dates.push(newDate);
       }
       return dates;
-    },
+    }
+
+    fetchSchedules();
+    return {
+      isLoading,
+      isLoaded,
+      search,
+      selected,
+      availableOptions,
+      schedules,
+      scheduleCounts,
+      dates: getDates(),
+    };
+  },
+  methods: {
     isToday(date) {
       const today = new Date();
       return (
