@@ -12,11 +12,11 @@
                 Email Address
               </label>
               <input
-                  type="email"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="e.g. adam127704@gmail.com"
-                  v-model="email"
-                  required
+                type="email"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="e.g. adam127704@gmail.com"
+                v-model="email"
+                required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -24,37 +24,37 @@
                 Password
               </label>
               <input
-                  type="password"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="**************"
-                  v-model="password"
-                  required
+                type="password"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                v-model="password"
+                required
               />
             </div>
             <div
-                class="d-flex align-items-center justify-content-between mb-15 mb-md-20"
+              class="d-flex align-items-center justify-content-between mb-15 mb-md-20"
             >
               <router-link
-                  to="/forgot-password"
-                  class="forgot-password-btn fs-md-15 fs-lg-16 text-decoration-none position-relative text-primary"
+                to="/forgot-password"
+                class="forgot-password-btn fs-md-15 fs-lg-16 text-decoration-none position-relative text-primary"
               >
                 Forgot Password?
               </router-link>
             </div>
             <button
-                class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 bg-success d-block w-100"
-                type="submit"
+              class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 bg-success d-block w-100"
+              type="submit"
             >
               Sign In Now
             </button>
             <span
-                class="d-block text-muted text-center mt-15 mt-md-30 mb-12 mb-md-20 fs-md-15 fs-lg-16"
+              class="d-block text-muted text-center mt-15 mt-md-30 mb-12 mb-md-20 fs-md-15 fs-lg-16"
             >
               Don’t have an account?
             </span>
             <router-link
-                to="/register"
-                class="default-btn with-border transition fw-medium rounded-1 fs-md-15 fs-lg-16 d-block w-100 text-decoration-none text-center"
+              to="/register"
+              class="default-btn with-border transition fw-medium rounded-1 fs-md-15 fs-lg-16 d-block w-100 text-decoration-none text-center"
             >
               Create Account
             </router-link>
@@ -82,7 +82,7 @@ export default defineComponent({
       try {
         const response = await API.post("/login", {
           email: this.email,
-          password: this.password
+          password: this.password,
         });
 
         const token = response.data.token;
@@ -93,7 +93,7 @@ export default defineComponent({
       } catch (error) {
         console.error("Error logging in:", error);
       }
-    }
-  }
+    },
+  },
 });
 </script>

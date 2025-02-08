@@ -7,9 +7,9 @@ interface StateStore {
 
 const stateStore: StateStore = reactive({
   open: true,
-  onChange ()  {
-    stateStore.open = !stateStore.open
+  onChange() {
+    stateStore.open = !stateStore.open;
   },
-})
+});
 
-export default stateStore
+export default stateStore;

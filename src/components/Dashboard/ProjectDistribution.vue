@@ -1,17 +1,20 @@
 <template>
   <div class="custom-card mb-25 border-0 rounded-0 bg-white">
-    <div class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing" :style="{ height: isLoaded ? 'auto' : '446px' }">
+    <div
+      class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
+      :style="{ height: isLoaded ? 'auto' : '446px' }"
+    >
       <div class="mb-15 d-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Project Distribution</h5>
       </div>
       <div id="projectDistributionChart" class="chart">
-        <loader-component v-if="isLoading" style="margin: 35% auto"/>
+        <loader-component v-if="isLoading" style="margin: 35% auto" />
         <apexchart
-            type="donut"
-            height="382"
-            :options="projectDistributionChart"
-            :series="distribution"
-            v-if="isLoaded"
+          type="donut"
+          height="382"
+          :options="projectDistributionChart"
+          :series="distribution"
+          v-if="isLoaded"
         ></apexchart>
       </div>
     </div>
@@ -19,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { API } from "@/api";
 import LoaderComponent from "../Layouts/Loader.vue";
 

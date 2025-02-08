@@ -14,23 +14,23 @@
                 Email Address
               </label>
               <input
-                  type="email"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="e.g. adam127704@gmail.com"
-                  v-model="email"
-                  required
+                type="email"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="e.g. adam127704@gmail.com"
+                v-model="email"
+                required
               />
             </div>
             <button
-                class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 d-block w-100"
-                type="submit"
+              class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 d-block w-100"
+              type="submit"
             >
               Submit
             </button>
             <div class="text-center mt-15 mt-sm-20 mt-md-25">
               <router-link
-                  to="/login"
-                  class="link-btn text-decoration-none text-primary fw-medium fs-md-15 fs-lg-16 position-relative"
+                to="/login"
+                class="link-btn text-decoration-none text-primary fw-medium fs-md-15 fs-lg-16 position-relative"
               >
                 <i class="ph-bold ph-arrow-left"></i>
                 Back To Sign In
@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
@@ -55,14 +55,17 @@ export default defineComponent({
     const router = useRouter();
 
     const handleSubmit = async () => {
-        try {
-        const response = await axios.post('http://localhost:5000/api/forgot-password', {
-          email: email.value,
-        });
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/forgot-password",
+          {
+            email: email.value,
+          }
+        );
 
         if (response.status === 200) {
           alert("Please check your email!");
-          await router.push({name: "LoginPage"});
+          await router.push({ name: "LoginPage" });
         }
       } catch (error) {
         console.error("Error during forgot password:", error);

@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import stateStore from "../../utils/store";
 import { API, setAuthToken } from "@/api";

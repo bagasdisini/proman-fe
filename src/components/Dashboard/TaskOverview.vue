@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { API, setAuthToken } from "@/api";
 
 interface TaskData {
@@ -97,12 +97,20 @@ export default defineComponent({
 
         const response = await API.get("/me/task/overview");
 
-        categories.value = response.data.map((item: any) => `${item.start} - ${item.end}`);
+        categories.value = response.data.map(
+          (item: any) => `${item.start} - ${item.end}`
+        );
         const counts = response.data.map((item: any) => item.count);
 
         task.value = [{ name: "This Week", data: counts }];
 
-        taskOverviewChart.value = { ...taskOverviewChart.value, xaxis: { ...taskOverviewChart.value.xaxis, categories: categories.value } };
+        taskOverviewChart.value = {
+          ...taskOverviewChart.value,
+          xaxis: {
+            ...taskOverviewChart.value.xaxis,
+            categories: categories.value,
+          },
+        };
       } catch (error) {
         console.error("Error fetching task overview:", error);
       }

@@ -27,17 +27,30 @@ export default defineComponent({
     const route = useRoute();
 
     const mainContentClass = computed(() => {
-      return route.path === "/login" || route.path === "/register" || route.path === "/forgot-password" || route.path === "/reset-password"
-          ? "main-content-login d-flex flex-column transition overflow-hidden"
-          : "main-content d-flex flex-column transition overflow-hidden";
+      return route.path === "/login" ||
+        route.path === "/register" ||
+        route.path === "/forgot-password" ||
+        route.path === "/reset-password"
+        ? "main-content-login d-flex flex-column transition overflow-hidden"
+        : "main-content d-flex flex-column transition overflow-hidden";
     });
 
     const showHeader = computed(() => {
-      return route.path !== "/login" && route.path !== "/register" && route.path !== "/forgot-password" && route.path !== "/reset-password";
+      return (
+        route.path !== "/login" &&
+        route.path !== "/register" &&
+        route.path !== "/forgot-password" &&
+        route.path !== "/reset-password"
+      );
     });
 
     const showSidebar = computed(() => {
-      return route.path !== "/login" && route.path !== "/register" && route.path !== "/forgot-password" && route.path !== "/reset-password";
+      return (
+        route.path !== "/login" &&
+        route.path !== "/register" &&
+        route.path !== "/forgot-password" &&
+        route.path !== "/reset-password"
+      );
     });
 
     const stateStoreInstance = stateStore;
@@ -53,10 +66,10 @@ export default defineComponent({
     return { mainContentClass, showHeader, showSidebar };
   },
   created() {
-    const isAuthenticated = !!localStorage.getItem('jwt');
+    const isAuthenticated = !!localStorage.getItem("jwt");
     if (isAuthenticated) {
-      this.$router.push({ name: 'HomePage' });
+      this.$router.push({ name: "HomePage" });
     }
-  }
+  },
 });
 </script>

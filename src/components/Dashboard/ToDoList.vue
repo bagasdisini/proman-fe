@@ -17,23 +17,24 @@
         </span>
       </div>
 
-
       <loader-component v-if="isLoading" style="margin: 35% auto" />
       <ul
         class="to-do-list ps-0 list-unstyled mb-0 custom-card-todo"
         v-if="isLoaded"
       >
-              <div v-if="sortedTasks.length === 0" class="text-center text-muted fw-bold text-dark-emphasis" style="font-size: medium; margin:auto">
-    Congratulations! You've unlocked the rare 'Do Nothing' achievement. 🎉
-  </div>
+        <div
+          v-if="sortedTasks.length === 0"
+          class="text-center text-muted fw-bold text-dark-emphasis"
+          style="font-size: medium; margin: auto"
+        >
+          Congratulations! You've unlocked the rare 'Do Nothing' achievement. 🎉
+        </div>
         <li
           class="to-do-list-item ps-8 pe-5 d-flex align-items-center justify-content-between"
           v-for="task in sortedTasks"
           :key="task._id"
         >
-          <div
-            class="form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium"
-          >
+          <div class="form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium">
             <input
               class="form-check-input shadow-none"
               type="checkbox"
@@ -179,13 +180,13 @@
                 </span>
               </div>
               <form @submit.prevent="addContributor">
-              <input
-                v-model="search"
-                class="form-control fs-md-15 text-black shadow-none"
-                list="datalistOptions"
-                id="dataList"
-                placeholder="Type to search..."
-              />
+                <input
+                  v-model="search"
+                  class="form-control fs-md-15 text-black shadow-none"
+                  list="datalistOptions"
+                  id="dataList"
+                  placeholder="Type to search..."
+                />
               </form>
               <datalist id="datalistOptions">
                 <option
@@ -308,13 +309,13 @@
                 </span>
               </div>
               <form @submit.prevent="addContributor">
-              <input
-                v-model="search"
-                class="form-control fs-md-15 text-black shadow-none"
-                list="datalistOptions"
-                id="dataList"
-                placeholder="Type to search..."
-              />
+                <input
+                  v-model="search"
+                  class="form-control fs-md-15 text-black shadow-none"
+                  list="datalistOptions"
+                  id="dataList"
+                  placeholder="Type to search..."
+                />
               </form>
               <datalist id="datalistOptions">
                 <option
@@ -384,7 +385,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { API, setAuthToken } from "@/api";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
 
@@ -406,7 +407,9 @@ export default defineComponent({
           const taskResponse = await API.get("/me/tasks");
 
           if (taskResponse.data && Array.isArray(taskResponse.data)) {
-            tasks.value = taskResponse.data.filter((task) => task.status === "active");
+            tasks.value = taskResponse.data.filter(
+              (task) => task.status === "active"
+            );
           }
         }
       } catch (error) {
@@ -420,10 +423,11 @@ export default defineComponent({
     onMounted(fetchData);
 
     const sortedTasks = computed(() => {
-      return [...tasks.value]
-        .sort((a, b) => {
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
+      return [...tasks.value].sort((a, b) => {
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
     });
 
     return {

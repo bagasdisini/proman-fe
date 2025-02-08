@@ -155,9 +155,7 @@
           >
             <span class="fw-medium text-secondary">
               Working:
-              <span class="fw-bold text-black">{{
-                totalMembers.working
-              }}</span>
+              <span class="fw-bold text-black">{{ totalMembers.working }}</span>
             </span>
             <span class="text-success fw-semibold"
               >{{ completedPercentMember }}%</span
@@ -182,7 +180,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { API, setAuthToken } from "@/api";
 import LoaderComponent from "../Layouts/Loader.vue";
 
@@ -192,7 +190,12 @@ export default defineComponent({
     LoaderComponent,
   },
   setup() {
-    const activeProjects = ref({ total: 0, completed: 0, pending: 0, active: 0 });
+    const activeProjects = ref({
+      total: 0,
+      completed: 0,
+      pending: 0,
+      active: 0,
+    });
     const activeTasks = ref({ total: 0, completed: 0, testing: 0, active: 0 });
     const totalMembers = ref({ total: 0, working: 0 });
     const isLoading = ref(true);

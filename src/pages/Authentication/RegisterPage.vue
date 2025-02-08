@@ -10,11 +10,11 @@
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
               <label class="d-block text-black fw-semibold mb-10">Name</label>
               <input
-                  type="text"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="e.g. Jacob Adam"
-                  v-model="name"
-                  required
+                type="text"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="e.g. Jacob Adam"
+                v-model="name"
+                required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -22,11 +22,11 @@
                 Email Address
               </label>
               <input
-                  type="email"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="e.g. adam127704@gmail.com"
-                  v-model="email"
-                  required
+                type="email"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="e.g. adam127704@gmail.com"
+                v-model="email"
+                required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -34,11 +34,11 @@
                 Password
               </label>
               <input
-                  type="password"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="**************"
-                  v-model="password"
-                  required
+                type="password"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                v-model="password"
+                required
               />
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
@@ -46,27 +46,27 @@
                 Confirm Password
               </label>
               <input
-                  type="password"
-                  class="form-control shadow-none rounded-0 text-black"
-                  placeholder="**************"
-                  v-model="confirmPassword"
-                  required
+                type="password"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                v-model="confirmPassword"
+                required
               />
             </div>
             <button
-                class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 bg-success d-block w-100"
-                type="submit"
+              class="default-btn transition border-0 fw-medium text-white rounded-1 fs-md-15 fs-lg-16 bg-success d-block w-100"
+              type="submit"
             >
               Register Now
             </button>
             <span
-                class="d-block text-muted text-center mt-15 mt-md-30 mb-12 mb-md-20 fs-md-15 fs-lg-16"
+              class="d-block text-muted text-center mt-15 mt-md-30 mb-12 mb-md-20 fs-md-15 fs-lg-16"
             >
               Already Have An Account?
             </span>
             <router-link
-                to="/login"
-                class="default-btn with-border transition fw-medium rounded-1 fs-md-15 fs-lg-16 d-block w-100 text-decoration-none text-center"
+              to="/login"
+              class="default-btn with-border transition fw-medium rounded-1 fs-md-15 fs-lg-16 d-block w-100 text-decoration-none text-center"
             >
               Log In Now
             </router-link>
@@ -98,16 +98,19 @@ export default defineComponent({
       }
 
       try {
-        const response = await axios.post('http://localhost:5000/api/register', {
-          name: name.value,
-          email: email.value,
-          password: password.value,
-          confirm_password: confirmPassword.value
-        });
+        const response = await axios.post(
+          "http://localhost:5000/api/register",
+          {
+            name: name.value,
+            email: email.value,
+            password: password.value,
+            confirm_password: confirmPassword.value,
+          }
+        );
 
         if (response.status === 200) {
           alert("Registration successful!");
-          await router.push({name: "LoginPage"});
+          await router.push({ name: "LoginPage" });
         }
       } catch (error) {
         console.error("Error during registration:", error);

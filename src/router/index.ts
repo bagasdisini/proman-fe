@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import LoginPage from "../pages/Authentication/LoginPage.vue";
 import RegisterPage from "../pages/Authentication/RegisterPage.vue";
@@ -7,8 +7,8 @@ import HomePage from "../pages/Dashboard/HomePage.vue";
 
 const routes = [
   {
-    path: '/',
-    redirect: '/login'
+    path: "/",
+    redirect: "/login",
   },
   {
     path: "/login",
@@ -82,12 +82,18 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('jwt');
+  const isAuthenticated = !!localStorage.getItem("jwt");
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next({ name: 'LoginPage' });
-  } else if (to.matched.some(record => record.meta.requiresGuest) && isAuthenticated) {
-    next({ name: 'HomePage' });
+  if (
+    to.matched.some((record) => record.meta.requiresAuth) &&
+    !isAuthenticated
+  ) {
+    next({ name: "LoginPage" });
+  } else if (
+    to.matched.some((record) => record.meta.requiresGuest) &&
+    isAuthenticated
+  ) {
+    next({ name: "HomePage" });
   } else {
     next();
   }

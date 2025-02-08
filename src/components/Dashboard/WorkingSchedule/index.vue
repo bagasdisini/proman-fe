@@ -34,24 +34,40 @@
           Add A Schedule
         </span>
       </div>
-        <div v-if="schedules.length === 0" class="text-center text-muted fw-bold text-dark-emphasis" style="font-size: medium; margin: 60% auto">
-    Looks like your schedule took a day off. Enjoy the free time! 🏖️
-  </div>
-      <loader-component v-if="isLoading" style="margin: 60% auto" />
-      <div v-if="isLoaded" class="schedule-list mt-15 mt-md-20 custom-card-work-schedule">
-<div v-if="schedules.length === 0">
-  </div>
-  <div v-else v-for="schedule in schedules" :key="schedule.id"
-    class="list-item pt-15 bg-f2f1f9 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center">
-    <div class="content">
-      <div class="d-flex align-items-center mb-5">
-        <h6 class="fw-medium mb-0">{{ schedule.start_time }} - {{ schedule.end_time }}</h6>
+      <div
+        v-if="schedules.length === 0"
+        class="text-center text-muted fw-bold text-dark-emphasis"
+        style="font-size: medium; margin: 60% auto"
+      >
+        Looks like your schedule took a day off. Enjoy the free time! 🏖️
       </div>
-      <span class="d-block text-black fw-semibold fs-md-15 mb-1">{{ schedule.name }}</span>
-      <span class="d-block text-muted fs-12 fw-medium">{{ schedule.contributor.join(", ") }}</span>
-    </div>
-  </div>
-</div>
+      <loader-component v-if="isLoading" style="margin: 60% auto" />
+      <div
+        v-if="isLoaded"
+        class="schedule-list mt-15 mt-md-20 custom-card-work-schedule"
+      >
+        <div v-if="schedules.length === 0"></div>
+        <div
+          v-else
+          v-for="schedule in schedules"
+          :key="schedule.id"
+          class="list-item pt-15 bg-f2f1f9 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center"
+        >
+          <div class="content">
+            <div class="d-flex align-items-center mb-5">
+              <h6 class="fw-medium mb-0">
+                {{ schedule.start_time }} - {{ schedule.end_time }}
+              </h6>
+            </div>
+            <span class="d-block text-black fw-semibold fs-md-15 mb-1">{{
+              schedule.name
+            }}</span>
+            <span class="d-block text-muted fs-12 fw-medium">{{
+              schedule.contributor.join(", ")
+            }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div
@@ -143,13 +159,13 @@
                 </span>
               </div>
               <form @submit.prevent="addContributor">
-              <input
-                v-model="search"
-                class="form-control fs-md-15 text-black shadow-none"
-                list="datalistOptions"
-                id="dataList"
-                placeholder="Type to search..."
-              />
+                <input
+                  v-model="search"
+                  class="form-control fs-md-15 text-black shadow-none"
+                  list="datalistOptions"
+                  id="dataList"
+                  placeholder="Type to search..."
+                />
               </form>
               <datalist id="datalistOptions">
                 <option
@@ -202,12 +218,7 @@ export default defineComponent({
     const isLoading = ref(true);
     const isLoaded = ref(false);
     const search = ref("");
-    const availableOptions = [
-      "Muhammad",
-      "Bagas",
-      "Sudibyo",
-      "3122510602",
-    ];
+    const availableOptions = ["Muhammad", "Bagas", "Sudibyo", "3122510602"];
     const selected = ["Bagas"];
     let schedules = ref([]);
     let scheduleCounts = ref({});
@@ -225,11 +236,13 @@ export default defineComponent({
           const end = new Date();
           end.setHours(23, 59, 59, 999);
 
-          const response = await API.get(`/me/schedules`); // ?start=${start.getTime()}&end=${end.getTime()}
+          const response = await API.get(
+            `/me/schedules?start=${start.getTime()}&end=${end.getTime()}`
+          );
 
           if (response.data) {
             let fetchedSchedules = response.data
-              .map(schedule => ({
+              .map((schedule) => ({
                 id: schedule.id,
                 name: schedule.name,
                 contributor: schedule.contributor,
@@ -262,7 +275,7 @@ export default defineComponent({
         isLoading.value = false;
         isLoaded.value = true;
       }, remainingTime);
-    }
+    };
 
     const getDates = () => {
       const now = new Date();
@@ -273,7 +286,7 @@ export default defineComponent({
         dates.push(newDate);
       }
       return dates;
-    }
+    };
 
     fetchSchedules();
     return {
