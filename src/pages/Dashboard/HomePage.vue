@@ -25,8 +25,8 @@ import { defineComponent } from "vue";
 import StatsItem from "../../components/Dashboard/StatsItem.vue";
 import TaskOverview from "../../components/Dashboard/TaskOverview.vue";
 import ProjectDistribution from "../../components/Dashboard/ProjectDistribution.vue";
-import WorkingSchedule from "../../components/Dashboard/WorkingSchedule/index.vue";
-import ProjectStats from "../../components/Dashboard/ProjectStats/index.vue";
+import WorkingSchedule from "../../components/Dashboard/WorkingSchedule.vue";
+import ProjectStats from "../../components/Dashboard/ProjectStats.vue";
 import ToDoList from "../../components/Dashboard/ToDoList.vue";
 
 export default defineComponent({

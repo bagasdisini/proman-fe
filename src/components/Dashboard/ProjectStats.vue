@@ -8,126 +8,123 @@
       </div>
       <div class="table-responsive">
         <loader-component v-if="isLoading" style="margin: 10% auto" />
-        <table class="table text-nowrap align-middle mb-0" v-if="isLoaded">
+        <table
+          class="table text-nowrap align-middle mb-0"
+          v-if="isLoaded && projects.length"
+        >
           <thead>
             <tr>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0 ps-0"
               >
                 PROJECT
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
               >
                 TYPE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
               >
                 START DATE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
               >
                 DUE DATE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
               >
                 PROGRESS
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
               >
                 STATUS
               </th>
-              <th
-                scope="col"
-                class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0 text-end pe-0"
-              ></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="stat in stats" :key="stat.id">
+            <tr v-for="project in projects" :key="project._id">
               <th
                 class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
               >
                 <div class="d-flex align-items-center">
                   <img
-                    :src="require(`../../../assets/images/${stat.image}`)"
+                    v-if="project.logo"
+                    :src="project.logo"
                     width="37"
                     height="37"
                     class="rounded-1 me-10"
                     alt="project-image"
                   />
-                  <span class="d-block">{{ stat.title }}</span>
+                  <span class="d-block">{{ project.name }}</span>
                 </div>
               </th>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                {{ stat.type }}
+                {{ project.type }}
               </td>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                {{ stat.startDate }}
+                {{ formatDate(project.start_date) }}
               </td>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                {{ stat.dueDate }}
+                {{ formatDate(project.end_date) }}
               </td>
               <td class="shadow-none lh-1 fw-medium text-body-tertiary">
                 <div
                   class="progress"
                   role="progressbar"
-                  :aria-valuenow="stat.progress"
+                  :aria-valuenow="getProgress(project)"
                   aria-valuemin="0"
                   aria-valuemax="100"
                 >
                   <div
                     class="progress-bar"
-                    :style="{ width: stat.progress + '%' }"
+                    :style="{ width: getProgress(project) + '%' }"
                   ></div>
                 </div>
               </td>
               <td class="shadow-none lh-1 fw-medium">
-                <span :class="['badge fs-13', stat.class]"
-                  >{{ stat.status }}
-                </span>
+                <span
+                  :class="['badge fs-13', getStatusClass(project.status)]"
+                  >{{ project.status }}</span
+                >
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
       <div
         class="pagination-area d-md-flex mt-15 mt-md-25 mb-0 justify-content-between align-items-center"
       >
-        <p class="mb-0 text-paragraph">
-          Showing <span class="fw-bold">11</span> out of
-          <span class="fw-bold">134</span> results
-        </p>
+        <p class="mb-0 text-paragraph"></p>
         <nav class="mt-15 mt-md-0">
           <ul class="pagination mb-0">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button class="page-link" @click="changePage(currentPage - 1)">
                 <i class="flaticon-chevron-1"></i>
-              </a>
+              </button>
             </li>
-            <li class="page-item">
-              <a class="page-link active" href="#">1</a>
+            <li v-for="page in totalPages" :key="page" class="page-item">
+              <button
+                class="page-link"
+                :class="{ active: currentPage === page }"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
             </li>
-            <li class="page-item">
-              <a class="page-link" href="#">2</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#">3</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next">
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <button class="page-link" @click="changePage(currentPage + 1)">
                 <i class="flaticon-chevron"></i>
-              </a>
+              </button>
             </li>
           </ul>
         </nav>
@@ -137,8 +134,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import projectStats from "./projectStats.json";
+import { defineComponent, onMounted, ref } from "vue";
+import { API, setAuthToken } from "@/api";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
 
 export default defineComponent({
@@ -146,22 +143,83 @@ export default defineComponent({
   components: {
     LoaderComponent,
   },
-  data() {
+  setup() {
     const isLoading = ref(true);
     const isLoaded = ref(false);
+    const projects = ref([]);
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const totalProjects = ref(0);
 
-    const fetchData = () => {
-      setTimeout(() => {
+    const fetchProjects = async (page = 1) => {
+      isLoading.value = true;
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+
+          const response = await API.get(
+            `/me/projects?sort=asc&page=${page}&limit=5`
+          );
+          const { result, total, pages } = response.data;
+
+          projects.value = result;
+          totalProjects.value = total;
+          totalPages.value = pages;
+          currentPage.value = page;
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
         isLoading.value = false;
         isLoaded.value = true;
-      }, 100);
+      }
     };
 
-    fetchData();
+    const formatDate = (dateStr: string) => {
+      return new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    };
+
+    const getProgress = (project: any) => {
+      const { active, testing, completed } = project.task_count;
+      const totalTasks = active + testing + completed;
+      return totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+    };
+
+    const getStatusClass = (status: string) => {
+      const statusMap: Record<string, string> = {
+        active: "text-outline-primary",
+        pending: "text-outline-danger",
+        completed: "text-outline-success",
+      };
+      return statusMap[status] || "text-outline-secondary";
+    };
+
+    const changePage = (page: number) => {
+      if (page >= 1 && page <= totalPages.value) {
+        fetchProjects(page);
+      }
+    };
+
+    onMounted(() => {
+      fetchProjects();
+    });
+
     return {
-      stats: projectStats,
       isLoading,
       isLoaded,
+      projects,
+      currentPage,
+      totalPages,
+      totalProjects,
+      formatDate,
+      getProgress,
+      getStatusClass,
+      changePage,
     };
   },
 });
