@@ -7,6 +7,22 @@
             Sign In To Your Account!
           </h4>
           <form @submit.prevent="handleSubmit">
+            <div
+              v-if="errorMessage"
+              class="alert alert-danger alert-dismissible d-flex align-items-center fs-md-15 fs-lg-16"
+              role="alert"
+            >
+              <i
+                class="flaticon-warning lh-1 fs-20 position-relative top-1 me-8"
+              ></i>
+              <span>{{ errorMessage }}</span>
+              <button
+                type="button"
+                class="btn-close shadow-none"
+                @click="errorMessage = ''"
+                aria-label="Close"
+              ></button>
+            </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
               <label class="d-block text-black fw-semibold mb-10">
                 Email Address
@@ -17,7 +33,11 @@
                 placeholder="e.g. adam127704@gmail.com"
                 v-model="email"
                 required
+                :class="{ 'is-invalid': errors.email }"
               />
+              <div v-if="errors.email" class="invalid-feedback">
+                {{ errors.email }}
+              </div>
             </div>
             <div class="form-group mb-15 mb-sm-20 mb-md-25">
               <label class="d-block text-black fw-semibold mb-10">
@@ -29,7 +49,11 @@
                 placeholder="**************"
                 v-model="password"
                 required
+                :class="{ 'is-invalid': errors.password }"
               />
+              <div v-if="errors.password" class="invalid-feedback">
+                {{ errors.password }}
+              </div>
             </div>
             <div
               class="d-flex align-items-center justify-content-between mb-15 mb-md-20"
@@ -75,10 +99,15 @@ export default defineComponent({
     return {
       email: "",
       password: "",
+      errors: {} as Record<string, string>,
+      errorMessage: "",
     };
   },
   methods: {
     async handleSubmit() {
+      this.errors = {};
+      this.errorMessage = "";
+
       try {
         const response = await API.post("/login", {
           email: this.email,
@@ -91,7 +120,27 @@ export default defineComponent({
 
         this.$router.push({ name: "HomePage" });
       } catch (error) {
-        console.error("Error logging in:", error);
+        if (error instanceof Error && "response" in error) {
+          const response = (
+            error as { response: { status: number; data: any } }
+          ).response;
+
+          if (response.status !== 200) {
+            const data = response.data;
+
+            if (typeof data.message === "string") {
+              this.errorMessage = data.message;
+            }
+
+            if (Array.isArray(data.errors)) {
+              data.errors.forEach((err: { field: string; message: string }) => {
+                this.errors[err.field] = err.message;
+              });
+            }
+          }
+        } else {
+          console.error("Unexpected error:", error);
+        }
       }
     },
   },
