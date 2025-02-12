@@ -2,19 +2,27 @@
   <div class="custom-card mb-25 border-0 rounded-0 bg-white">
     <div
       class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
-      :style="{ height: isLoaded ? 'auto' : '446px' }"
+      :style="{ height: isLoaded ? '450px' : '450px' }"
     >
       <div class="mb-15 d-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Project Distribution</h5>
       </div>
+
       <div id="projectDistributionChart" class="chart">
+        <div
+          v-if="!isHaveData && !isLoading"
+          class="text-center text-muted fw-bold text-dark-emphasis"
+          style="font-size: medium; margin: 35% auto"
+        >
+          There is no project that has been created yet.
+        </div>
         <loader-component v-if="isLoading" style="margin: 35% auto" />
         <apexchart
           type="donut"
           height="382"
           :options="projectDistributionChart"
           :series="distribution"
-          v-if="isLoaded"
+          v-if="isLoaded && isHaveData"
         ></apexchart>
       </div>
     </div>
@@ -36,6 +44,7 @@ export default defineComponent({
     const labels = ref<string[]>([]);
     const isLoading = ref(true);
     const isLoaded = ref(false);
+    const isHaveData = computed(() => distribution.value.length > 0);
 
     const projectColors: Record<string, string> = {
       frontend: "#F1421B",
@@ -110,7 +119,13 @@ export default defineComponent({
       },
     }));
 
-    return { distribution, isLoading, isLoaded, projectDistributionChart };
+    return {
+      distribution,
+      isLoading,
+      isLoaded,
+      projectDistributionChart,
+      isHaveData,
+    };
   },
 });
 </script>

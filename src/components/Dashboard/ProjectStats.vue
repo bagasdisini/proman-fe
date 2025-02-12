@@ -1,12 +1,22 @@
 <template>
   <div class="card mb-25 border-0 rounded-0 bg-white">
-    <div class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing">
+    <div
+      class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing"
+      :style="{ height: isLoaded ? '500px' : '500px' }"
+    >
       <div
         class="mb-15 mb-md-25 d-sm-flex align-items-center justify-content-between"
       >
         <h5 class="card-title fw-bold mb-0">Project Stats</h5>
       </div>
       <div class="table-responsive">
+        <div
+          v-if="!projects.length && isLoaded"
+          class="text-center text-muted fw-bold text-dark-emphasis"
+          style="font-size: medium; margin: 10% auto"
+        >
+          There is no project that has been created yet.
+        </div>
         <loader-component v-if="isLoading" style="margin: 10% auto" />
         <table
           class="table text-nowrap align-middle mb-0"
@@ -99,6 +109,7 @@
 
       <!-- Pagination -->
       <div
+        v-if="isLoaded && projects.length"
         class="pagination-area d-md-flex mt-15 mt-md-25 mb-0 justify-content-between align-items-center"
       >
         <p class="mb-0 text-paragraph"></p>

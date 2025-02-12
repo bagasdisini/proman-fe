@@ -2,7 +2,7 @@
   <div class="mb-25 border-0 rounded-0 bg-white to-do-list-box">
     <div
       class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing align-items-center"
-      :style="{ height: isLoaded ? 'auto' : '446px' }"
+      :style="{ height: isLoaded ? '450px' : '450px' }"
     >
       <div
         class="mb-15 mb-md-25 d-sm-flex align-items-center justify-content-between"
@@ -27,7 +27,7 @@
           class="text-center text-muted fw-bold text-dark-emphasis"
           style="font-size: medium; margin: auto"
         >
-          Congratulations! You've unlocked the rare 'Do Nothing' achievement. 🎉
+          There is no task that has been created yet.
         </div>
         <li
           class="to-do-list-item ps-8 pe-5 d-flex align-items-center justify-content-between"

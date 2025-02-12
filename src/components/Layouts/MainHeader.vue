@@ -131,7 +131,13 @@ export default defineComponent({
           const response = await API.get("/me");
           userName.value = response.data.name;
           userPosition.value = response.data.position;
-          userAvatar.value = response.data.avatar;
+
+          if (response.data.avatar) {
+            userAvatar.value = response.data.avatar;
+          } else {
+            userAvatar.value =
+              "https://netray-spaces.s3.nevaobjects.id/proman/avatar/1739388422880783400-CoeJmpzQiD-4201745905.jpeg";
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);

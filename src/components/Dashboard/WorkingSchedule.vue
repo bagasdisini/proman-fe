@@ -2,7 +2,7 @@
   <div class="mb-25 border-0 rounded-0 bg-white working-schedule-box">
     <div
       class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
-      :style="{ height: isLoaded ? '915px' : '915px' }"
+      :style="{ height: isLoaded ? '920px' : '920px' }"
     >
       <div class="mb-15 d-sm-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Working Schedule</h5>
@@ -39,7 +39,7 @@
         class="text-center text-muted fw-bold text-dark-emphasis"
         style="font-size: medium; margin: 60% auto"
       >
-        Looks like your schedule took a day off. Enjoy the free time! 🏖️
+        There is no schedule for today.
       </div>
       <loader-component v-if="isLoading" style="margin: 60% auto" />
       <div
