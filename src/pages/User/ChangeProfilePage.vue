@@ -9,9 +9,10 @@
                 Full Name
               </label>
               <input
+                :value="full_name"
                 type="text"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. Adam"
+                placeholder="John Doe"
               />
             </div>
           </div>
@@ -21,9 +22,10 @@
                 Phone No
               </label>
               <input
+                :value="phone"
                 type="text"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. +001 321 4567"
+                placeholder="0851-2221-2223"
               />
             </div>
           </div>
@@ -33,9 +35,10 @@
                 Email Address
               </label>
               <input
+                :value="email"
                 type="email"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. adam127704@gmail.com"
+                placeholder="example@email.com"
               />
             </div>
           </div>
@@ -47,7 +50,7 @@
               <input
                 type="email"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. 123456"
+                placeholder="123456"
               />
             </div>
           </div>
@@ -87,10 +90,35 @@ import { defineComponent } from "vue";
 import BlotFormatter from "quill-blot-formatter";
 import ImageUploader from "quill-image-uploader";
 import axios from "axios";
+import { API, setAuthToken } from "@/api";
 
 export default defineComponent({
   name: "ProfileSettings",
   components: {},
+  data() {
+    return {
+      full_name: "",
+      phone: "",
+      email: "",
+      verification_code: "",
+    };
+  },
+  mounted() {
+    this.getProfile();
+  },
+  methods: {
+    async getProfile() {
+      const token = localStorage.getItem("jwt");
+      if (token) {
+        setAuthToken(token);
+        const meResponse = await API.get("/me");
+        this.full_name = meResponse.data.name;
+        this.phone = meResponse.data.phone;
+        this.email = meResponse.data.email;
+      }
+    },
+  },
+
   setup: () => {
     const modules = {
       module: BlotFormatter,
