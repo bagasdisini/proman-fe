@@ -4,6 +4,12 @@ import LoginPage from "../pages/Authentication/LoginPage.vue";
 import RegisterPage from "../pages/Authentication/RegisterPage.vue";
 import ForgotPasswordPage from "../pages/Authentication/ForgotPasswordPage.vue";
 import HomePage from "../pages/Dashboard/HomePage.vue";
+import CalendarPage from "@/pages/Dashboard/CalendarPage.vue";
+import MemberList from "@/pages/Dashboard/MemberListPage.vue";
+import TaskList from "@/pages/Dashboard/TaskListPage.vue";
+import ProjectsList from "@/pages/Dashboard/ProjectListPage.vue";
+import ProfileSettings from "@/pages/User/ChangeProfilePage.vue";
+import ChangePassword from "@/pages/User/ChangePasswordPage.vue";
 
 const routes = [
   {
@@ -37,37 +43,37 @@ const routes = [
   {
     path: "/project-list",
     name: "ProjectListPage",
-    component: HomePage,
+    component: ProjectsList,
     meta: { requiresAuth: true },
   },
   {
     path: "/task-list",
     name: "TaskListPage",
-    component: HomePage,
+    component: TaskList,
     meta: { requiresAuth: true },
   },
   {
     path: "/member-list",
     name: "MemberListPage",
-    component: HomePage,
+    component: MemberList,
     meta: { requiresAuth: true },
   },
   {
     path: "/calendar",
     name: "CalendarPage",
-    component: HomePage,
+    component: CalendarPage,
     meta: { requiresAuth: true },
   },
   {
     path: "/change-profile",
     name: "ChangeProfile",
-    component: HomePage,
+    component: ProfileSettings,
     meta: { requiresAuth: true },
   },
   {
     path: "/change-password",
     name: "ChangePassword",
-    component: HomePage,
+    component: ChangePassword,
     meta: { requiresAuth: true },
   },
 ];

@@ -2,7 +2,7 @@
   <div class="mb-25 border-0 rounded-0 bg-white working-schedule-box">
     <div
       class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
-      :style="{ height: isLoaded ? '920px' : '920px' }"
+      :style="{ height: isLoaded ? '915px' : '915px' }"
     >
       <div class="mb-15 d-sm-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Working Schedule</h5>

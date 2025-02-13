@@ -2,7 +2,7 @@
   <div class="custom-card mb-25 border-0 rounded-0 bg-white">
     <div
       class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
-      :style="{ height: isLoaded ? '450px' : '450px' }"
+      :style="{ height: isLoaded ? '445px' : '445px' }"
     >
       <div class="mb-15 d-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Project Distribution</h5>

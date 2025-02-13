@@ -2,7 +2,7 @@
   <div class="mb-25 border-0 rounded-0 bg-white to-do-list-box">
     <div
       class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing align-items-center"
-      :style="{ height: isLoaded ? '450px' : '450px' }"
+      :style="{ height: isLoaded ? '445px' : '445px' }"
     >
       <div
         class="mb-15 mb-md-25 d-sm-flex align-items-center justify-content-between"

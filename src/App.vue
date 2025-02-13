@@ -67,8 +67,8 @@ export default defineComponent({
   },
   created() {
     const isAuthenticated = !!localStorage.getItem("jwt");
-    if (isAuthenticated) {
-      this.$router.push({ name: "HomePage" });
+    if (!isAuthenticated) {
+      this.$router.push({ name: "LoginPage" });
     }
   },
 });

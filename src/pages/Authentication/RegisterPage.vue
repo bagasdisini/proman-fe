@@ -30,7 +30,7 @@
               <input
                 type="text"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. Jacob Adam"
+                placeholder="John Doe"
                 v-model="name"
                 required
                 :class="{ 'is-invalid': errors.name }"
@@ -46,7 +46,7 @@
               <input
                 type="email"
                 class="form-control shadow-none rounded-0 text-black"
-                placeholder="e.g. adam127704@gmail.com"
+                placeholder="example@email.com"
                 v-model="email"
                 required
                 :class="{ 'is-invalid': errors.email }"
