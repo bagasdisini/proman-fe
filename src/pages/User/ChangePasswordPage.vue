@@ -9,12 +9,12 @@
                 Old Password <span class="text-danger">*</span>
               </label>
               <input
-                required
-                type="password"
-                class="form-control shadow-none rounded-0 text-black"
-                placeholder="**************"
                 v-model="old_password"
                 :class="{ 'is-invalid': errors.old_password }"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                required
+                type="password"
               />
               <div v-if="errors.old_password" class="invalid-feedback">
                 {{ errors.old_password }}
@@ -27,12 +27,12 @@
                 New Password <span class="text-danger">*</span>
               </label>
               <input
-                required
-                type="password"
-                class="form-control shadow-none rounded-0 text-black"
-                placeholder="**************"
                 v-model="new_password"
                 :class="{ 'is-invalid': errors.new_password }"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                required
+                type="password"
               />
               <div v-if="errors.new_password" class="invalid-feedback">
                 {{ errors.new_password }}
@@ -45,12 +45,12 @@
                 Confirm Password <span class="text-danger">*</span>
               </label>
               <input
-                required
-                type="password"
-                class="form-control shadow-none rounded-0 text-black"
-                placeholder="**************"
                 v-model="confirm_password"
                 :class="{ 'is-invalid': errors.confirm_password }"
+                class="form-control shadow-none rounded-0 text-black"
+                placeholder="**************"
+                required
+                type="password"
               />
               <div v-if="errors.confirm_password" class="invalid-feedback">
                 {{ errors.confirm_password }}
@@ -63,29 +63,30 @@
                 Email Confirmation Code <span class="text-danger">*</span>
               </label>
               <input
-                required
-                type="text"
+                v-model="verification_code"
                 class="form-control shadow-none rounded-0 text-black"
                 placeholder="123456"
-                v-model="verification_code"
+                required
+                type="text"
               />
             </div>
           </div>
           <div class="col-md-12">
             <div class="d-flex align-items-center justify-content-between">
               <button
+                :disabled="loading"
+                class="default-btn transition border-0 fw-medium text-white pt-10 pb-10 ps-25 pe-25 pt-md-11 pb-md-11 ps-md-35 pe-md-35 rounded-1 fs-md-15 fs-lg-16 bg-secondary"
                 type="button"
                 @click="getConfirmationCode"
-                class="default-btn transition border-0 fw-medium text-white pt-10 pb-10 ps-25 pe-25 pt-md-11 pb-md-11 ps-md-35 pe-md-35 rounded-1 fs-md-15 fs-lg-16 bg-secondary"
-                :disabled="loading"
               >
                 {{ loading ? "Sending..." : "Get Confirmation Code" }}
               </button>
               <button
+                :disabled="loadingUpdate"
                 class="default-btn transition border-0 fw-medium text-white pt-10 pb-10 ps-25 pe-25 pt-md-11 pb-md-11 ps-md-35 pe-md-35 rounded-1 fs-md-15 fs-lg-16 bg-success"
                 type="submit"
               >
-                Save Profile
+                {{ loadingUpdate ? "Updating..." : "Save Password" }}
               </button>
             </div>
           </div>
@@ -94,41 +95,41 @@
     </div>
   </div>
   <div
-    class="toast align-items-center text-bg-primary border-0 position-fixed bottom-1 end-0 m-3"
-    ref="toast"
-    role="alert"
-    aria-live="assertive"
+    ref="toastRef"
     aria-atomic="true"
+    aria-live="assertive"
+    class="toast align-items-center text-bg-primary border-0 position-fixed bottom-1 end-0 m-3"
+    role="alert"
   >
     <div class="d-flex">
       <div class="toast-body fs-md-15 fs-lg-16">
         {{ message }}
       </div>
       <button
-        type="button"
+        aria-label="Close"
         class="btn-close shadow-none btn-close-white me-2 m-auto"
         data-bs-dismiss="toast"
-        aria-label="Close"
+        type="button"
       ></button>
     </div>
   </div>
 
   <div
-    class="toast align-items-center text-bg-danger border-0 position-fixed bottom-1 end-0 m-3"
-    ref="errorToast"
-    role="alert"
-    aria-live="assertive"
+    ref="errorToastRef"
     aria-atomic="true"
+    aria-live="assertive"
+    class="toast align-items-center text-bg-danger border-0 position-fixed bottom-1 end-0 m-3"
+    role="alert"
   >
     <div class="d-flex">
       <div class="toast-body fs-md-15 fs-lg-16">
         {{ errorMessage }}
       </div>
       <button
-        type="button"
+        aria-label="Close"
         class="btn-close shadow-none btn-close-white me-2 m-auto"
         data-bs-dismiss="toast"
-        aria-label="Close"
+        type="button"
       ></button>
     </div>
   </div>
@@ -137,38 +138,58 @@
 <script lang="ts">
 import { API, setAuthToken } from "@/api";
 import { Toast } from "bootstrap";
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
   name: "ChangePassword",
-  data() {
-    return {
-      old_password: "",
-      new_password: "",
-      confirm_password: "",
-      verification_code: "",
-      loading: false,
-      message: "",
-      toastInstance: null,
-      errorToastInstance: null,
-      errors: {} as Record<string, string>,
-      errorMessage: "",
+  setup() {
+    const old_password = ref("");
+    const new_password = ref("");
+    const confirm_password = ref("");
+    const verification_code = ref("");
+    const loading = ref(false);
+    const loadingUpdate = ref(false);
+    const message = ref("");
+    const errorMessage = ref("");
+    const errors = ref<Record<string, string>>({});
+
+    const toastRef = ref<HTMLDivElement | null>(null);
+    const errorToastRef = ref<HTMLDivElement | null>(null);
+    let toastInstance: Toast | null = null;
+    let errorToastInstance: Toast | null = null;
+
+    onMounted(() => {
+      if (toastRef.value) {
+        toastInstance = new Toast(toastRef.value, {
+          autohide: true,
+          delay: 2500,
+        });
+      }
+      if (errorToastRef.value) {
+        errorToastInstance = new Toast(errorToastRef.value, {
+          autohide: true,
+          delay: 2500,
+        });
+      }
+    });
+
+    const showToast = () => {
+      if (toastInstance) {
+        errorToastInstance?.hide();
+        toastInstance.show();
+      }
     };
-  },
-  mounted() {
-    this.toastInstance = new Toast(this.$refs.toast, {
-      autohide: true,
-      delay: 2500,
-    });
-    this.errorToastInstance = new Toast(this.$refs.errorToast, {
-      autohide: true,
-      delay: 2500,
-    });
-  },
-  methods: {
-    async getConfirmationCode() {
-      this.message = "";
-      this.loading = true;
+
+    const showErrorToast = () => {
+      if (errorToastInstance) {
+        toastInstance?.hide();
+        errorToastInstance.show();
+      }
+    };
+
+    const getConfirmationCode = async () => {
+      message.value = "";
+      loading.value = true;
 
       try {
         const token = localStorage.getItem("jwt");
@@ -192,74 +213,81 @@ export default defineComponent({
           }
         );
 
-        this.message = response.data.message;
-        this.showToast();
+        message.value = response.data.message;
+        showToast();
+      } catch (error) {
+        console.error("Error getting confirmation code:", error);
       } finally {
-        this.loading = false;
-        this.showToast();
+        loading.value = false;
       }
-    },
+    };
 
-    async handleSubmit(event) {
-      this.errors = {};
-      this.errorMessage = "";
+    const handleSubmit = async (event: Event) => {
+      errors.value = {};
+      errorMessage.value = "";
+
+      loadingUpdate.value = true;
 
       event.preventDefault();
 
       try {
         await API.put("/me/password", {
-          old_password: this.old_password,
-          new_password: this.new_password,
-          confirm_password: this.confirm_password,
-          verification_code: this.verification_code,
+          old_password: old_password.value,
+          new_password: new_password.value,
+          confirm_password: confirm_password.value,
+          verification_code: verification_code.value,
         });
 
-        this.message = "Password changed successfully!";
-        this.showToast();
+        message.value = "Password changed successfully!";
+        showToast();
 
-        this.old_password = "";
-        this.new_password = "";
-        this.confirm_password = "";
-        this.verification_code = "";
-      } catch (error) {
-        if (error instanceof Error && "response" in error) {
-          const response = (
-            error as { response: { status: number; data: any } }
-          ).response;
+        old_password.value = "";
+        new_password.value = "";
+        confirm_password.value = "";
+        verification_code.value = "";
+      } catch (error: any) {
+        if (error.response) {
+          const response = error.response;
 
           if (response.status !== 200) {
             const data = response.data;
 
             if (typeof data.message === "string") {
-              this.errorMessage = data.message;
-              this.showErrorToast();
+              errorMessage.value = data.message;
+              showErrorToast();
             }
 
             if (Array.isArray(data.errors)) {
               data.errors.forEach((err: { field: string; message: string }) => {
-                this.errors[err.field] = err.message;
+                errors.value[err.field] = err.message;
               });
             }
           }
         } else {
           console.error("Unexpected error:", error);
         }
+      } finally {
+        loadingUpdate.value = false;
       }
-    },
+    };
 
-    showToast() {
-      if (this.toastInstance) {
-        this.errorToastInstance.hide();
-        this.toastInstance.show();
-      }
-    },
-
-    showErrorToast() {
-      if (this.errorToastInstance) {
-        this.toastInstance.hide();
-        this.errorToastInstance.show();
-      }
-    },
+    return {
+      old_password,
+      new_password,
+      confirm_password,
+      verification_code,
+      loading,
+      loadingUpdate,
+      message,
+      errorMessage,
+      errors,
+      toastRef,
+      errorToastRef,
+      showToast,
+      showErrorToast,
+      getConfirmationCode,
+      handleSubmit,
+    };
   },
 });
 </script>

@@ -1,10 +1,10 @@
 <template>
   <header
+    id="header"
     :class="[
       'header-area bg-white text-center text-md-start pt-15 pb-15 ps-15 pe-15 ps-md-20 pe-md-20 pe-lg-30 transition mb-25 position-fixed',
       { sticky: isSticky },
     ]"
-    id="header"
   >
     <div class="row align-items-center">
       <div class="col-xl-4 col-lg-5 col-md-6">
@@ -12,8 +12,8 @@
           class="header-left-side justify-content-center justify-content-md-start d-flex align-items-center"
         >
           <button
-            class="header-burger-menu transition position-relative lh-1 bg-transparent p-0 border-0"
             id="header-burger-menu"
+            class="header-burger-menu transition position-relative lh-1 bg-transparent p-0 border-0"
             @click="stateStoreInstance.onChange"
           >
             <i class="flaticon-menu-3"></i>
@@ -21,9 +21,9 @@
           <form class="search-box">
             <div class="input-group">
               <input
-                type="text"
                 class="form-control shadow-none rounded-0 border-0"
                 placeholder="Search here"
+                type="text"
               />
               <button
                 class="default-btn position-relative transition border-0 fw-medium text-white pt-8 pb-8 ps-15 pe-15 pt-md-12 pb-md-12 ps-md-20 pe-md-20"
@@ -44,17 +44,17 @@
         >
           <div class="dropdown profile-dropdown">
             <button
-              class="dropdown-toggle text-start fs-14 text-black-emphasis d-flex align-items-center p-0 position-relative bg-transparent border-0 transition lh-1"
-              type="button"
-              data-bs-toggle="dropdown"
               aria-expanded="false"
+              class="dropdown-toggle text-start fs-14 text-black-emphasis d-flex align-items-center p-0 position-relative bg-transparent border-0 transition lh-1"
+              data-bs-toggle="dropdown"
+              type="button"
             >
               <img
                 :src="userAvatar"
-                class="rounded"
-                width="44"
-                height="44"
                 alt="admin"
+                class="rounded"
+                height="44"
+                width="44"
               />
               <span class="title d-none d-lg-block ms-10 ms-lg-15">
                 <span class="d-block fw-bold mb-5 mb-md-8">{{ userName }}</span>
@@ -73,8 +73,8 @@
                   <i class="flaticon-user-2"></i>
                   Change Profile
                   <router-link
-                    to="/change-profile"
                     class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
+                    to="/change-profile"
                   ></router-link>
                 </li>
                 <li
@@ -83,8 +83,8 @@
                   <i class="flaticon-setting"></i>
                   Change Password
                   <router-link
-                    to="/change-password"
                     class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
+                    to="/change-password"
                   ></router-link>
                 </li>
                 <li
@@ -93,8 +93,8 @@
                   <i class="flaticon-logout"></i>
                   Logout
                   <router-link
-                    to="/"
                     class="d-block position-absolute start-0 top-0 end-0 bottom-0 text-decoration-none"
+                    to="/"
                     @click="handleLogout"
                   ></router-link>
                 </li>
@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import stateStore from "../../utils/store";
 import { API, setAuthToken } from "@/api";
@@ -150,6 +150,12 @@ export default defineComponent({
         isSticky.value = scrollPos >= 100;
       });
       fetchUserData();
+
+      window.addEventListener("user-updated", fetchUserData);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("user-updated", fetchUserData);
     });
 
     const handleLogout = () => {
