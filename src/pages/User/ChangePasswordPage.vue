@@ -95,7 +95,7 @@
   </div>
   <div
     class="toast align-items-center text-bg-primary border-0 position-fixed bottom-1 end-0 m-3"
-    ref="toast"
+    ref="toastRef"
     role="alert"
     aria-live="assertive"
     aria-atomic="true"
@@ -115,7 +115,7 @@
 
   <div
     class="toast align-items-center text-bg-danger border-0 position-fixed bottom-1 end-0 m-3"
-    ref="errorToast"
+    ref="errorToastRef"
     role="alert"
     aria-live="assertive"
     aria-atomic="true"
@@ -135,40 +135,59 @@
 </template>
 
 <script lang="ts">
-import { API, setAuthToken } from "@/api";
-import { Toast } from "bootstrap";
-import { defineComponent } from "vue";
+import {API, setAuthToken} from "@/api";
+import {Toast} from "bootstrap";
+import {defineComponent, onMounted, ref} from "vue";
 
 export default defineComponent({
   name: "ChangePassword",
-  data() {
-    return {
-      old_password: "",
-      new_password: "",
-      confirm_password: "",
-      verification_code: "",
-      loading: false,
-      message: "",
-      toastInstance: null,
-      errorToastInstance: null,
-      errors: {} as Record<string, string>,
-      errorMessage: "",
+  setup() {
+    const old_password = ref("");
+    const new_password = ref("");
+    const confirm_password = ref("");
+    const verification_code = ref("");
+    const loading = ref(false);
+    const message = ref("");
+    const errorMessage = ref("");
+    const errors = ref<Record<string, string>>({});
+
+    const toastRef = ref<HTMLDivElement | null>(null);
+    const errorToastRef = ref<HTMLDivElement | null>(null);
+    let toastInstance: Toast | null = null;
+    let errorToastInstance: Toast | null = null;
+
+    onMounted(() => {
+      if (toastRef.value) {
+        toastInstance = new Toast(toastRef.value, {
+          autohide: true,
+          delay: 2500,
+        });
+      }
+      if (errorToastRef.value) {
+        errorToastInstance = new Toast(errorToastRef.value, {
+          autohide: true,
+          delay: 2500,
+        });
+      }
+    });
+
+    const showToast = () => {
+      if (toastInstance) {
+        errorToastInstance?.hide();
+        toastInstance.show();
+      }
     };
-  },
-  mounted() {
-    this.toastInstance = new Toast(this.$refs.toast, {
-      autohide: true,
-      delay: 2500,
-    });
-    this.errorToastInstance = new Toast(this.$refs.errorToast, {
-      autohide: true,
-      delay: 2500,
-    });
-  },
-  methods: {
-    async getConfirmationCode() {
-      this.message = "";
-      this.loading = true;
+
+    const showErrorToast = () => {
+      if (errorToastInstance) {
+        toastInstance?.hide();
+        errorToastInstance.show();
+      }
+    };
+
+    const getConfirmationCode = async () => {
+      message.value = "";
+      loading.value = true;
 
       try {
         const token = localStorage.getItem("jwt");
@@ -192,52 +211,51 @@ export default defineComponent({
           }
         );
 
-        this.message = response.data.message;
-        this.showToast();
+        message.value = response.data.message;
+        showToast();
+      } catch (error) {
+        console.error("Error getting confirmation code:", error);
       } finally {
-        this.loading = false;
-        this.showToast();
+        loading.value = false;
       }
-    },
+    };
 
-    async handleSubmit(event) {
-      this.errors = {};
-      this.errorMessage = "";
+    const handleSubmit = async (event: Event) => {
+      errors.value = {};
+      errorMessage.value = "";
 
       event.preventDefault();
 
       try {
         await API.put("/me/password", {
-          old_password: this.old_password,
-          new_password: this.new_password,
-          confirm_password: this.confirm_password,
-          verification_code: this.verification_code,
+          old_password: old_password.value,
+          new_password: new_password.value,
+          confirm_password: confirm_password.value,
+          verification_code: verification_code.value,
         });
 
-        this.message = "Password changed successfully!";
-        this.showToast();
+        message.value = "Password changed successfully!";
+        showToast();
 
-        this.old_password = "";
-        this.new_password = "";
-        this.confirm_password = "";
-        this.verification_code = "";
-      } catch (error) {
-        if (error instanceof Error && "response" in error) {
-          const response = (
-            error as { response: { status: number; data: any } }
-          ).response;
+        old_password.value = "";
+        new_password.value = "";
+        confirm_password.value = "";
+        verification_code.value = "";
+      } catch (error: any) {
+        if (error.response) {
+          const response = error.response;
 
           if (response.status !== 200) {
             const data = response.data;
 
             if (typeof data.message === "string") {
-              this.errorMessage = data.message;
-              this.showErrorToast();
+              errorMessage.value = data.message;
+              showErrorToast();
             }
 
             if (Array.isArray(data.errors)) {
               data.errors.forEach((err: { field: string; message: string }) => {
-                this.errors[err.field] = err.message;
+                errors.value[err.field] = err.message;
               });
             }
           }
@@ -245,21 +263,24 @@ export default defineComponent({
           console.error("Unexpected error:", error);
         }
       }
-    },
+    };
 
-    showToast() {
-      if (this.toastInstance) {
-        this.errorToastInstance.hide();
-        this.toastInstance.show();
-      }
-    },
-
-    showErrorToast() {
-      if (this.errorToastInstance) {
-        this.toastInstance.hide();
-        this.errorToastInstance.show();
-      }
-    },
+    return {
+      old_password,
+      new_password,
+      confirm_password,
+      verification_code,
+      loading,
+      message,
+      errorMessage,
+      errors,
+      toastRef,
+      errorToastRef,
+      showToast,
+      showErrorToast,
+      getConfirmationCode,
+      handleSubmit,
+    };
   },
 });
 </script>
