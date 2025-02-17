@@ -6,13 +6,13 @@
       <div class="d-sm-flex align-items-center">
         <form class="search-box position-relative">
           <input
-            type="text"
             class="form-control shadow-none text-black rounded-0 border-0"
             placeholder="Search project"
+            type="text"
           />
           <button
-            type="submit"
             class="bg-transparent text-primary transition p-0 border-0"
+            type="submit"
           >
             <i class="flaticon-search-interface-symbol"></i>
           </button>
@@ -20,8 +20,8 @@
       </div>
       <div class="d-sm-flex align-items-center mt-10 mt-lg-0">
         <router-link
-          to="/create-new-project"
           class="default-btn position-relative transition border-0 fw-medium text-white pt-11 pb-11 ps-25 pe-25 pt-md-11 pb-md-11 ps-md-30 pe-md-30 rounded-1 bg-success fs-md-15 fs-lg-16 d-inline-block d-inline-block text-decoration-none"
+          to="/create-new-project"
         >
           Add New Project
           <i class="flaticon-plus position-relative ms-5 fs-12"></i>
@@ -42,978 +42,133 @@
           <thead>
             <tr>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0 ps-0"
+                scope="col"
               >
                 PROJECT
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
+                scope="col"
               >
                 TYPE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
+                scope="col"
               >
                 START DATE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
+                scope="col"
               >
                 DUE DATE
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
+                scope="col"
               >
                 PROGRESS
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
+                scope="col"
               >
                 STATUS
               </th>
               <th
-                scope="col"
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0 text-end pe-0"
+                scope="col"
               ></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr v-for="project in projects" :key="project._id">
               <th
                 class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
               >
                 <div class="d-flex align-items-center">
                   <img
-                    src="@/assets/images/projects/project-mini1.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
+                    v-if="project.logo"
+                    :src="project.logo"
                     alt="project-image"
+                    class="rounded-1 me-10"
+                    height="37"
+                    width="37"
                   />
                   <router-link
                     class="d-block text-decoration-none text-black"
                     to="/project-details"
                   >
-                    Dashboard Design
+                    <span class="d-block">{{ project.name }}</span>
                   </router-link>
                 </div>
               </th>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
+                {{ project.type }}
               </td>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
+                {{ formatDate(project.start_date) }}
               </td>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
+                {{ formatDate(project.end_date) }}
               </td>
               <td class="shadow-none lh-1 fw-medium text-body-tertiary">
                 <div
+                  :aria-valuenow="getProgress(project)"
+                  aria-valuemax="100"
+                  aria-valuemin="0"
                   class="progress"
                   role="progressbar"
-                  aria-valuenow="80"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
                 >
-                  <div class="progress-bar" style="width: 80%"></div>
+                  <div
+                    :style="{ width: getProgress(project) + '%' }"
+                    class="progress-bar"
+                  ></div>
                 </div>
               </td>
               <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-primary fs-13">In Process</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini2.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Banko CRM Dashboard Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="25"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
+                <span
+                  :class="['badge fs-13', getStatusClass(project.status)]"
+                  >{{ project.status }}</span
                 >
-                  <div class="progress-bar" style="width: 25%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-danger fs-13">On Hold</span>
               </td>
               <td
                 class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini3.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Agency Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="100"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 100%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-success fs-13">Completed</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini4.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Dashboard Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="40"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 40%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-primary fs-13">In Process</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini5.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    App Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="55"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 55%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-success fs-13">Completed</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini1.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Dashboard Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="80"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 80%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-primary fs-13">In Process</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini2.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Banko CRM Dashboard Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="25"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 25%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-danger fs-13">On Hold</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini3.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Agency Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="100"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 100%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-success fs-13">Completed</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini4.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    Dashboard Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="40"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 40%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-primary fs-13">In Process</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th
-                class="shadow-none title lh-1 fw-medium fs-md-15 fs-lg-16 ps-0"
-              >
-                <div class="d-flex align-items-center">
-                  <img
-                    src="@/assets/images/projects/project-mini5.jpg"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
-                    alt="project-image"
-                  />
-                  <router-link
-                    class="d-block text-decoration-none text-black"
-                    to="/project-details"
-                  >
-                    App Design
-                  </router-link>
-                </div>
-              </th>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                Web Design
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                01 Mar 2024
-              </td>
-              <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                10 Sep 2024
-              </td>
-              <td class="shadow-none lh-1 fw-medium text-body-tertiary">
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-valuenow="55"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <div class="progress-bar" style="width: 55%"></div>
-                </div>
-              </td>
-              <td class="shadow-none lh-1 fw-medium">
-                <span class="badge text-outline-success fs-13">Completed</span>
-              </td>
-              <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              >
-                <div class="dropdown">
-                  <button
-                    class="dropdown-toggle lh-1 bg-transparent border-0 shadow-none p-0 transition"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i class="flaticon-dots"></i>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-view lh-1 me-8 position-relative top-1"
-                        ></i>
-                        View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-pen lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Edit</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item d-flex align-items-center"
-                        href="javascript:void(0);"
-                        ><i
-                          class="flaticon-delete lh-1 me-8 position-relative top-1"
-                        ></i>
-                        Delete</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </td>
+              ></td>
             </tr>
           </tbody>
         </table>
       </div>
       <div
+        v-if="projects.length"
         class="pagination-area d-md-flex mt-15 mt-md-25 mb-0 justify-content-between align-items-center"
       >
-        <p class="mb-0 text-paragraph">
-          Showing <span class="fw-bold">11</span> out of
-          <span class="fw-bold">134</span> results
-        </p>
+        <p class="mb-0 text-paragraph"></p>
         <nav class="mt-15 mt-md-0">
           <ul class="pagination mb-0">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous">
+            <li :class="{ disabled: currentPage === 1 }" class="page-item">
+              <button class="page-link" @click="changePage(currentPage - 1)">
                 <i class="flaticon-chevron-1"></i>
-              </a>
+              </button>
             </li>
-            <li class="page-item">
-              <a class="page-link active" href="#">1</a>
+            <li v-for="page in totalPages" :key="page" class="page-item">
+              <button
+                :class="{ active: currentPage === page }"
+                class="page-link"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
             </li>
-            <li class="page-item">
-              <a class="page-link" href="#">2</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#">3</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next">
+            <li
+              :class="{ disabled: currentPage === totalPages }"
+              class="page-item"
+            >
+              <button class="page-link" @click="changePage(currentPage + 1)">
                 <i class="flaticon-chevron"></i>
-              </a>
+              </button>
             </li>
           </ul>
         </nav>
@@ -1022,8 +177,82 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, onMounted, ref } from "vue";
+import { API, setAuthToken } from "@/api";
+
+export default defineComponent({
   name: "ProjectsList",
-};
+  setup() {
+    const projects = ref([]);
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const totalProjects = ref(0);
+
+    const fetchProjects = async (page = 1) => {
+      try {
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          setAuthToken(token);
+
+          const response = await API.get(
+            `/projects?sort=asc&page=${page}&limit=10`
+          );
+          const { result, total, pages } = response.data;
+
+          projects.value = result;
+          totalProjects.value = total;
+          totalPages.value = pages;
+          currentPage.value = page;
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      }
+    };
+
+    const formatDate = (dateStr: string) => {
+      return new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    };
+
+    const getProgress = (project: any) => {
+      const { active, testing, completed } = project.task_count;
+      const totalTasks = active + testing + completed;
+      return totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+    };
+
+    const getStatusClass = (status: string) => {
+      const statusMap: Record<string, string> = {
+        active: "text-outline-primary",
+        pending: "text-outline-danger",
+        completed: "text-outline-success",
+      };
+      return statusMap[status] || "text-outline-secondary";
+    };
+
+    const changePage = (page: number) => {
+      if (page >= 1 && page <= totalPages.value) {
+        fetchProjects(page);
+      }
+    };
+
+    onMounted(() => {
+      fetchProjects();
+    });
+
+    return {
+      projects,
+      currentPage,
+      totalPages,
+      totalProjects,
+      formatDate,
+      getProgress,
+      getStatusClass,
+      changePage,
+    };
+  },
+});
 </script>
