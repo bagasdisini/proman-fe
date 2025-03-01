@@ -6,7 +6,7 @@ interface StateStore {
 }
 
 const storedState = localStorage.getItem("sidebarState");
-const initialState = storedState ? JSON.parse(storedState) : true;
+const initialState = storedState ? JSON.parse(storedState) : false;
 
 const stateStore: StateStore = reactive({
   open: initialState,
