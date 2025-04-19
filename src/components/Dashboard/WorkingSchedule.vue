@@ -1,8 +1,8 @@
 <template>
   <div class="mb-25 border-0 rounded-0 bg-white working-schedule-box">
     <div
-      class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
       :style="{ height: isLoaded ? '915px' : '915px' }"
+      class="card-body p-15 p-sm-20 p-sm-25 p-lg-30 letter-spacing"
     >
       <div class="mb-15 d-sm-flex align-items-center justify-content-between">
         <h5 class="card-title fw-bold mb-0">Working Schedule</h5>
@@ -11,10 +11,10 @@
         class="schedule-date-list ps-0 mb-0 list-unstyled d-flex flex-wrap text-center"
       >
         <li
-          class="col text-black fw-medium"
           v-for="date in dates"
           :key="date.toString()"
           :class="{ active: isToday(date) }"
+          class="col text-black fw-medium"
         >
           <span class="d-block fw-bold text-dark-emphasis">{{
             date.toLocaleDateString("default", { weekday: "short" })
@@ -27,9 +27,9 @@
       >
         <h6 class="card-title fw-bold mb-0">Todays Schedule</h6>
         <span
-          data-bs-toggle="modal"
-          data-bs-target="#addScheduleModal"
           class="card-link-btn text-decoration-none text-primary fw-medium position-relative"
+          data-bs-target="#addScheduleModal"
+          data-bs-toggle="modal"
         >
           Add A Schedule
         </span>
@@ -48,8 +48,8 @@
       >
         <div v-if="schedules.length === 0"></div>
         <div
-          v-else
           v-for="schedule in schedules"
+          v-else
           :key="schedule.id"
           class="list-item pt-15 bg-f2f1f9 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center"
         >
@@ -71,56 +71,103 @@
     </div>
   </div>
   <div
-    class="modal fade"
     id="addScheduleModal"
-    tabindex="-1"
     aria-hidden="true"
+    class="modal fade"
+    tabindex="-1"
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header me-md-20 ms-md-20">
           <h1 class="modal-title fs-5">Add Schedule</h1>
           <button
-            type="button"
+            aria-label="Close"
             class="btn-close"
             data-bs-dismiss="modal"
-            aria-label="Close"
+            type="button"
           ></button>
         </div>
         <div class="modal-body me-md-20 ms-md-20">
           <form>
-            <div class="mb-mb-15 mb-md-20">
-              <label for="titleTask" class="form-label fw-medium">Title</label>
-              <input
-                type="text"
-                class="form-control shadow-none text-black fs-md-15 fs-lg-16"
-                id="titleTask"
-              />
+            <div
+              v-if="errorMessage"
+              class="alert alert-danger alert-dismissible d-flex align-items-center fs-md-15 fs-lg-16"
+              role="alert"
+            >
+              <i
+                class="flaticon-warning lh-1 fs-20 position-relative top-1 me-8"
+              ></i>
+              <span>{{ errorMessage }}</span>
+              <button
+                aria-label="Close"
+                class="btn-close shadow-none"
+                type="button"
+                @click="errorMessage = ''"
+              ></button>
             </div>
-            <div class="mb-mb-15 mb-md-20">
-              <label for="descTask" class="form-label fw-medium"
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="titleTask">Title</label>
+              <input
+                id="titleTask"
+                v-model="scheduleForm.name"
+                :class="{ 'is-invalid': errors.name }"
+                class="form-control shadow-none text-black fs-md-15 fs-lg-16"
+                type="text"
+              />
+              <div v-if="errors.name" class="invalid-feedback">
+                {{ errors.name }}
+              </div>
+            </div>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="descTask"
                 >Description</label
               >
               <textarea
-                class="form-control shadow-none fs-md-15 text-black"
                 id="descTask"
+                v-model="scheduleForm.description"
+                :class="{ 'is-invalid': errors.description }"
+                class="form-control shadow-none fs-md-15 text-black"
                 rows="3"
               ></textarea>
+              <div v-if="errors.description" class="invalid-feedback">
+                {{ errors.description }}
+              </div>
             </div>
-            <div class="mb-mb-15 mb-md-20 row">
+            <div class="mb-15 mb-md-20 row">
               <div class="col-md-6">
                 <div class="form-group mb-15 mb-sm-20 mb-md-25">
                   <label
                     class="d-block text-black fw-semibold mb-10"
                     for="startDate"
+                    >Start Date</label
                   >
-                    Start Date
-                  </label>
                   <input
-                    type="date"
-                    class="form-control shadow-none text-black fs-md-15"
                     id="startDate"
+                    v-model="scheduleForm.start_date"
+                    :class="{ 'is-invalid': errors.start_date }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    type="date"
                   />
+                  <div v-if="errors.start_date" class="invalid-feedback">
+                    {{ errors.start_date }}
+                  </div>
+                </div>
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="startTime"
+                    >Start Time</label
+                  >
+                  <input
+                    id="startTime"
+                    v-model="scheduleForm.start_time"
+                    :class="{ 'is-invalid': errors.start_time }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    type="time"
+                  />
+                  <div v-if="errors.start_time" class="invalid-feedback">
+                    {{ errors.start_time }}
+                  </div>
                 </div>
               </div>
               <div class="col-md-6">
@@ -128,28 +175,47 @@
                   <label
                     class="d-block text-black fw-semibold mb-10"
                     for="endDate"
+                    >End Date</label
                   >
-                    End Date
-                  </label>
                   <input
-                    type="date"
-                    class="form-control shadow-none text-black fs-md-15"
                     id="endDate"
+                    v-model="scheduleForm.end_date"
+                    :class="{ 'is-invalid': errors.end_date }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    type="date"
                   />
+                  <div v-if="errors.end_date" class="invalid-feedback">
+                    {{ errors.end_date }}
+                  </div>
+                </div>
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="endTime"
+                    >End Time</label
+                  >
+                  <input
+                    id="endTime"
+                    v-model="scheduleForm.end_time"
+                    :class="{ 'is-invalid': errors.end_time }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    type="time"
+                  />
+                  <div v-if="errors.end_time" class="invalid-feedback">
+                    {{ errors.end_time }}
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="mb-mb-15 mb-md-20">
-              <label for="descTask" class="form-label fw-medium"
-                >Contributor</label
-              >
-              <div class="selected-contributors">
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium">Contributors</label>
+              <div class="selected-contributors mb-2">
                 <span
-                  v-for="(contributor, index) in selected"
-                  :key="index"
+                  v-for="(contributor, index) in selectedContributors"
+                  :key="contributor._id"
                   class="selected-contributor"
                 >
-                  {{ contributor }}
+                  {{ contributor.name }}
                   <button
                     class="remove-button"
                     @click.prevent="removeContributor(index)"
@@ -158,44 +224,64 @@
                   </button>
                 </span>
               </div>
-              <form @submit.prevent="addContributor">
+              <div class="input-group">
                 <input
                   v-model="search"
+                  :class="{ 'is-invalid': errors.contributor }"
                   class="form-control fs-md-15 text-black shadow-none"
-                  list="datalistOptions"
-                  id="dataList"
-                  placeholder="Type to search..."
+                  placeholder="Type to search users..."
+                  @input="searchUsers"
                 />
-              </form>
-              <datalist id="datalistOptions">
-                <option
-                  v-for="(contributor, index) in availableOptions"
-                  :key="index"
-                  :value="contributor"
-                ></option>
-              </datalist>
+                <div v-if="errors.contributor" class="invalid-feedback">
+                  {{ errors.contributor }}
+                </div>
+              </div>
+              <div
+                v-if="searchResults.length > 0 && search !== ''"
+                class="dropdown-menu show w-100"
+              >
+                <div
+                  v-for="user in searchResults"
+                  :key="user._id"
+                  class="dropdown-item"
+                  @click="addContributor(user)"
+                >
+                  {{ user.name }} ({{ user.email }})
+                </div>
+              </div>
             </div>
-            <div class="mb-mb-15 mb-md-20">
-              <label for="descTask" class="form-label fw-medium">Type</label>
-              <select class="form-select shadow-none text-black fs-md-15">
-                <option value="1">Meeting</option>
-                <option value="2">Discussion</option>
-                <option value="3">Reviews</option>
-                <option value="4">Sharing Session</option>
-                <option value="5">Others</option>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="scheduleType"
+                >Type</label
+              >
+              <select
+                id="scheduleType"
+                v-model="scheduleForm.type"
+                :class="{ 'is-invalid': errors.type }"
+                class="form-select shadow-none text-black fs-md-15"
+              >
+                <option value="meeting">Meeting</option>
+                <option value="discussion">Discussion</option>
+                <option value="review">Review</option>
+                <option value="presentation">Presentation</option>
+                <option value="etc">Etc</option>
               </select>
+              <div v-if="errors.type" class="invalid-feedback">
+                {{ errors.type }}
+              </div>
             </div>
           </form>
         </div>
         <div class="modal-footer me-md-20 ms-md-20">
           <button
-            type="button"
             class="btn btn-secondary"
             data-bs-dismiss="modal"
+            type="button"
+            @click="resetForm"
           >
             Close
           </button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          <button class="btn btn-primary" type="button" @click="submitSchedule">
             Create
           </button>
         </div>
@@ -205,23 +291,60 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
 import { API, setAuthToken } from "@/api";
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  position?: string;
+}
+
+interface ScheduleForm {
+  name: string;
+  description: string;
+  start_date: string;
+  start_time: string;
+  end_date: string;
+  end_time: string;
+  type: string;
+}
 
 export default defineComponent({
   name: "WorkingSchedule",
   components: {
     LoaderComponent,
   },
+  data() {
+    return {
+      errors: {} as Record<string, string>,
+      errorMessage: "",
+    };
+  },
   setup() {
     const isLoading = ref(true);
     const isLoaded = ref(false);
-    const search = ref("");
-    const availableOptions = ["Muhammad", "Bagas", "Sudibyo", "3122510602"];
-    const selected = ["Bagas"];
+
     let schedules = ref([]);
     let scheduleCounts = ref({});
+
+    const search = ref("");
+    const searchResults = ref<User[]>([]);
+    const selectedContributors = ref<User[]>([]);
+    const loading = ref(false);
+
+    const scheduleForm = reactive<ScheduleForm>({
+      name: "",
+      description: "",
+      start_date: "",
+      start_time: "",
+      end_date: "",
+      end_time: "",
+      type: "meeting",
+    });
 
     const fetchSchedules = async () => {
       const startTime = performance.now();
@@ -293,8 +416,10 @@ export default defineComponent({
       isLoading,
       isLoaded,
       search,
-      selected,
-      availableOptions,
+      searchResults,
+      selectedContributors,
+      loading,
+      scheduleForm,
       schedules,
       scheduleCounts,
       dates: getDates(),
@@ -309,14 +434,114 @@ export default defineComponent({
         date.getFullYear() === today.getFullYear()
       );
     },
-    addContributor() {
-      if (this.search) {
-        this.selected.push(this.search);
-        this.search = "";
+
+    async searchUsers() {
+      if (this.search.trim().length < 2) {
+        this.searchResults = [];
+        return;
+      }
+
+      try {
+        this.loading = true;
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        const response = await API.get(`/users?q=${this.search}`);
+
+        this.searchResults = response.data.result || [];
+      } catch (error) {
+        console.error("Error searching users:", error);
+        this.searchResults = [];
+      } finally {
+        this.loading = false;
       }
     },
-    removeContributor(index) {
-      this.selected.splice(index, 1);
+
+    addContributor(user: User) {
+      const exists = this.selectedContributors.some((c) => c._id === user._id);
+      if (!exists) {
+        this.selectedContributors.push(user);
+      }
+      this.search = "";
+      this.searchResults = [];
+    },
+
+    removeContributor(index: number) {
+      this.selectedContributors.splice(index, 1);
+    },
+
+    async submitSchedule() {
+      try {
+        this.loading = true;
+        this.errors = {};
+        this.errorMessage = "";
+
+        const startDate = new Date(this.scheduleForm.start_date).getTime();
+        const endDate = new Date(this.scheduleForm.end_date).getTime();
+
+        const contributorIds = this.selectedContributors
+          .map((c) => c._id)
+          .join(",");
+
+        const payload = {
+          name: this.scheduleForm.name,
+          description: this.scheduleForm.description,
+          start_date: startDate,
+          start_time: this.scheduleForm.start_time,
+          end_date: endDate,
+          end_time: this.scheduleForm.end_time,
+          type: this.scheduleForm.type,
+          contributor: contributorIds,
+        };
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        const response = await API.post("/schedule", payload);
+
+        this.resetForm();
+        this.$emit("close");
+      } catch (error) {
+        if (error instanceof Error && "response" in error) {
+          const response = (
+            error as { response: { status: number; data: any } }
+          ).response;
+
+          if (response.status !== 200) {
+            const data = response.data;
+
+            if (typeof data.message === "string") {
+              this.errorMessage = data.message;
+            }
+
+            if (Array.isArray(data.errors)) {
+              data.errors.forEach((err: { field: string; message: string }) => {
+                this.errors[err.field] = err.message;
+              });
+            }
+          }
+        } else {
+          console.error("Unexpected error:", error);
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    resetForm() {
+      this.scheduleForm.name = "";
+      this.scheduleForm.description = "";
+      this.scheduleForm.start_date = "";
+      this.scheduleForm.start_time = "";
+      this.scheduleForm.end_date = "";
+      this.scheduleForm.end_time = "";
+      this.scheduleForm.type = "meeting";
+      this.selectedContributors = [];
+      this.search = "";
+      this.searchResults = [];
+      this.errors = {};
+      this.errorMessage = "";
     },
   },
 });
@@ -343,5 +568,18 @@ export default defineComponent({
   background-color: transparent;
   color: #888;
   cursor: pointer;
+}
+
+.dropdown-menu {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
 }
 </style>

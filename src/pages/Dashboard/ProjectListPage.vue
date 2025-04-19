@@ -30,9 +30,9 @@
           class="project-select form-select shadow-none fw-semibold rounded-1 mt-10 mt-sm-0 ms-sm-10"
         >
           <option selected>All</option>
-          <option value="1">In Process</option>
-          <option value="2">On Hold</option>
-          <option value="3">Completed</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
         </select>
       </div>
     </div>
