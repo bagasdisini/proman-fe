@@ -294,13 +294,12 @@
 import { defineComponent, reactive, ref } from "vue";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
 import { API, setAuthToken } from "@/api";
+import { Modal } from "bootstrap";
 
 interface User {
   _id: string;
   name: string;
   email: string;
-  avatar?: string;
-  position?: string;
 }
 
 interface ScheduleForm {
@@ -346,7 +345,38 @@ export default defineComponent({
       type: "meeting",
     });
 
-    const fetchSchedules = async () => {
+    const getDates = () => {
+      const now = new Date();
+      let dates: Date[] = [];
+      for (let i = -3; i <= 3; i++) {
+        const newDate = new Date(now);
+        newDate.setDate(now.getDate() + i);
+        dates.push(newDate);
+      }
+      return dates;
+    };
+
+    return {
+      isLoading,
+      isLoaded,
+      search,
+      searchResults,
+      selectedContributors,
+      loading,
+      scheduleForm,
+      schedules,
+      scheduleCounts,
+      dates: getDates(),
+    };
+  },
+  mounted() {
+    this.fetchSchedules();
+  },
+  methods: {
+    async fetchSchedules() {
+      this.isLoading = true;
+      this.isLoaded = false;
+
       const startTime = performance.now();
 
       try {
@@ -380,8 +410,8 @@ export default defineComponent({
               return acc;
             }, {});
 
-            schedules.value = fetchedSchedules;
-            scheduleCounts.value = counts;
+            this.schedules = fetchedSchedules;
+            this.scheduleCounts = counts;
           }
         }
       } catch (error) {
@@ -395,37 +425,11 @@ export default defineComponent({
       const remainingTime = Math.max(minDelay - requestDuration, 0);
 
       setTimeout(() => {
-        isLoading.value = false;
-        isLoaded.value = true;
+        this.isLoading = false;
+        this.isLoaded = true;
       }, remainingTime);
-    };
+    },
 
-    const getDates = () => {
-      const now = new Date();
-      let dates: Date[] = [];
-      for (let i = -3; i <= 3; i++) {
-        const newDate = new Date(now);
-        newDate.setDate(now.getDate() + i);
-        dates.push(newDate);
-      }
-      return dates;
-    };
-
-    fetchSchedules();
-    return {
-      isLoading,
-      isLoaded,
-      search,
-      searchResults,
-      selectedContributors,
-      loading,
-      scheduleForm,
-      schedules,
-      scheduleCounts,
-      dates: getDates(),
-    };
-  },
-  methods: {
     isToday(date) {
       const today = new Date();
       return (
@@ -500,8 +504,17 @@ export default defineComponent({
 
         const response = await API.post("/schedule", payload);
 
+        const modalElement = document.getElementById("addScheduleModal");
+        if (modalElement) {
+          const modalInstance = Modal.getInstance(modalElement as Element);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+
         this.resetForm();
-        this.$emit("close");
+
+        this.fetchSchedules();
       } catch (error) {
         if (error instanceof Error && "response" in error) {
           const response = (
