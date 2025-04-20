@@ -37,9 +37,10 @@
           <div class="form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium">
             <input
               :id="'task' + task._id"
-              :checked="task.status === 'completed'"
+              :checked="task.type === 'done'"
               class="form-check-input shadow-none"
               type="checkbox"
+              @change="toggleTaskStatus(task._id, $event.target.checked)"
             />
             <label :for="'task' + task._id" class="form-check-label">
               {{ task.name }}
@@ -64,27 +65,21 @@
                   View
                 </a>
               </li>
-              <li
-                data-bs-target="#editTaskModal"
-                data-bs-toggle="modal"
-                type="button"
-              >
+              <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
                   href="javascript:void(0);"
+                  @click="openEditModal(task._id)"
                 >
                   <i class="flaticon-pen lh-1 me-8"></i>
                   Edit
                 </a>
               </li>
-              <li
-                data-bs-target="#deleteTaskModal"
-                data-bs-toggle="modal"
-                type="button"
-              >
+              <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
                   href="javascript:void(0);"
+                  @click="openDeleteModal(task._id)"
                 >
                   <i class="flaticon-delete lh-1 me-8"></i>
                   Delete
@@ -318,99 +313,165 @@
         </div>
         <div class="modal-body me-md-20 ms-md-20">
           <form>
+            <div
+              v-if="errorMessage"
+              class="alert alert-danger alert-dismissible d-flex align-items-center fs-md-15 fs-lg-16"
+              role="alert"
+            >
+              <i
+                class="flaticon-warning lh-1 fs-20 position-relative top-1 me-8"
+              ></i>
+              <span>{{ errorMessage }}</span>
+              <button
+                aria-label="Close"
+                class="btn-close shadow-none"
+                type="button"
+                @click="errorMessage = ''"
+              ></button>
+            </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="titleTask">Title</label>
+              <label class="form-label fw-medium" for="editTitleTask"
+                >Title</label
+              >
               <input
-                id="titleTask"
+                id="editTitleTask"
+                v-model="editForm.name"
+                :class="{ 'is-invalid': errors.name }"
                 class="form-control shadow-none text-black fs-md-15 fs-lg-16"
                 type="text"
               />
+              <div v-if="errors.name" class="invalid-feedback">
+                {{ errors.name }}
+              </div>
             </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="descTask"
+              <label class="form-label fw-medium" for="editDescTask"
                 >Description</label
               >
               <textarea
-                id="descTask"
+                id="editDescTask"
+                v-model="editForm.description"
+                :class="{ 'is-invalid': errors.description }"
                 class="form-control shadow-none fs-md-15 text-black"
                 rows="3"
               ></textarea>
+              <div v-if="errors.description" class="invalid-feedback">
+                {{ errors.description }}
+              </div>
+            </div>
+            <div class="mb-mb-15 mb-md-20">
+              <label class="form-label fw-medium">Project</label>
+              <div class="input-group">
+                <input
+                  v-model="editProjectName"
+                  class="form-control fs-md-15 text-black shadow-none"
+                  disabled
+                />
+              </div>
             </div>
             <div class="mb-mb-15 mb-md-20 row">
               <div class="col-md-6">
                 <div class="form-group mb-15 mb-sm-20 mb-md-25">
                   <label
                     class="d-block text-black fw-semibold mb-10"
-                    for="startDate"
+                    for="editStartDate"
                   >
                     Start Date
                   </label>
                   <input
-                    id="startDate"
+                    id="editStartDate"
+                    v-model="editForm.start_date"
+                    :class="{ 'is-invalid': errors.start_date }"
                     class="form-control shadow-none text-black fs-md-15"
                     type="date"
                   />
+                  <div v-if="errors.start_date" class="invalid-feedback">
+                    {{ errors.start_date }}
+                  </div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group mb-15 mb-sm-20 mb-md-25">
                   <label
                     class="d-block text-black fw-semibold mb-10"
-                    for="endDate"
+                    for="editEndDate"
                   >
                     End Date
                   </label>
                   <input
-                    id="endDate"
+                    id="editEndDate"
+                    v-model="editForm.end_date"
+                    :class="{ 'is-invalid': errors.end_date }"
                     class="form-control shadow-none text-black fs-md-15"
                     type="date"
                   />
+                  <div v-if="errors.end_date" class="invalid-feedback">
+                    {{ errors.end_date }}
+                  </div>
                 </div>
               </div>
             </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="descTask"
-                >Contributor</label
-              >
-              <div class="selected-contributors">
+              <label class="form-label fw-medium">Contributors</label>
+              <div class="selected-contributors mb-2">
                 <span
-                  v-for="(contributor, index) in selected"
-                  :key="index"
+                  v-for="(contributor, index) in editContributors"
+                  :key="contributor._id"
                   class="selected-contributor"
                 >
-                  {{ contributor }}
+                  {{ contributor.name }}
                   <button
                     class="remove-button"
-                    @click.prevent="removeContributor(index)"
+                    @click.prevent="removeEditContributor(index)"
                   >
                     &times;
                   </button>
                 </span>
               </div>
-              <form @submit.prevent="addContributor">
+              <div class="input-group">
                 <input
-                  id="dataList"
-                  v-model="search"
+                  v-model="editSearch"
+                  :class="{ 'is-invalid': errors.contributor }"
                   class="form-control fs-md-15 text-black shadow-none"
-                  list="datalistOptions"
-                  placeholder="Type to search..."
+                  placeholder="Type to search users..."
+                  @input="searchEditUsers"
                 />
-              </form>
-              <datalist id="datalistOptions">
-                <option
-                  v-for="(contributor, index) in availableOptions"
-                  :key="index"
-                  :value="contributor"
-                ></option>
-              </datalist>
+                <div v-if="errors.contributor" class="invalid-feedback">
+                  {{ errors.contributor }}
+                </div>
+              </div>
+              <div
+                v-if="editSearchResults.length > 0 && editSearch !== ''"
+                class="dropdown-menu show w-100"
+              >
+                <div
+                  v-for="user in editSearchResults"
+                  :key="user._id"
+                  class="dropdown-item"
+                  @click="addEditContributor(user)"
+                >
+                  {{ user.name }} ({{ user.email }})
+                </div>
+              </div>
             </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="descTask">Status</label>
-              <select class="form-select shadow-none text-black fs-md-15">
-                <option value="1">Progress</option>
-                <option value="2">Done</option>
-                <option value="3">Canceled</option>
+              <label class="form-label fw-medium" for="editTaskType"
+                >Status</label
+              >
+              <select
+                id="editTaskType"
+                v-model="editForm.type"
+                :class="{ 'is-invalid': errors.type }"
+                class="form-select shadow-none text-black fs-md-15"
+              >
+                <option value="progress">Progress</option>
+                <option value="testing">Testing</option>
+                <option value="done">Done</option>
+                <option value="canceled">Canceled</option>
               </select>
+              <div v-if="errors.type" class="invalid-feedback">
+                {{ errors.type }}
+              </div>
             </div>
           </form>
         </div>
@@ -419,11 +480,12 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
             type="button"
+            @click="resetEditForm"
           >
             Close
           </button>
-          <button class="btn btn-warning" data-bs-dismiss="modal" type="button">
-            Edit
+          <button class="btn btn-warning" type="button" @click="updateTask">
+            Update
           </button>
         </div>
       </div>
@@ -454,7 +516,7 @@
           >
             Close
           </button>
-          <button class="btn btn-danger" data-bs-dismiss="modal" type="button">
+          <button class="btn btn-danger" type="button" @click="deleteTask">
             Delete
           </button>
         </div>
@@ -505,6 +567,7 @@ export default defineComponent({
     const isLoaded = ref(false);
 
     const tasks = ref<any[]>([]);
+    const currentTaskId = ref<string>("");
 
     const search = ref("");
     const searchResults = ref<User[]>([]);
@@ -515,6 +578,19 @@ export default defineComponent({
     const projectResults = ref<Project[]>([]);
     const selectedProject = ref<Project | null>(null);
     const showProjectDropdown = ref(false);
+
+    const editForm = reactive<TaskForm>({
+      name: "",
+      description: "",
+      start_date: "",
+      end_date: "",
+      project_id: "",
+      type: "progress",
+    });
+    const editProjectName = ref("");
+    const editSearch = ref("");
+    const editSearchResults = ref<User[]>([]);
+    const editContributors = ref<User[]>([]);
 
     const taskForm = reactive<TaskForm>({
       name: "",
@@ -555,10 +631,57 @@ export default defineComponent({
           showProjectDropdown.value = false;
         }
       });
+
+      const addTaskModal = document.getElementById("addTaskModal");
+      const editTaskModal = document.getElementById("editTaskModal");
+
+      if (addTaskModal) {
+        addTaskModal.addEventListener("hidden.bs.modal", () => {
+          resetForm();
+        });
+      }
+
+      if (editTaskModal) {
+        editTaskModal.addEventListener("hidden.bs.modal", () => {
+          resetEditForm();
+        });
+      }
     });
+
+    const resetForm = () => {
+      taskForm.name = "";
+      taskForm.description = "";
+      taskForm.start_date = "";
+      taskForm.end_date = "";
+      taskForm.project_id = "";
+      taskForm.type = "progress";
+      selectedContributors.value = [];
+      selectedProject.value = null;
+      projectSearch.value = "";
+      search.value = "";
+      searchResults.value = [];
+      projectResults.value = [];
+    };
+
+    const resetEditForm = () => {
+      editForm.name = "";
+      editForm.description = "";
+      editForm.start_date = "";
+      editForm.end_date = "";
+      editForm.project_id = "";
+      editForm.type = "progress";
+      editContributors.value = [];
+      editProjectName.value = "";
+      editSearch.value = "";
+      editSearchResults.value = [];
+      currentTaskId.value = "";
+    };
 
     const sortedTasks = computed(() => {
       return [...tasks.value].sort((a, b) => {
+        if (a.type === "done" && b.type !== "done") return 1;
+        if (a.type !== "done" && b.type === "done") return -1;
+
         return (
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
@@ -579,6 +702,14 @@ export default defineComponent({
       showProjectDropdown,
       loading,
       taskForm,
+      resetForm,
+      currentTaskId,
+      editForm,
+      editProjectName,
+      editSearch,
+      editSearchResults,
+      editContributors,
+      resetEditForm,
     };
   },
 
@@ -601,6 +732,29 @@ export default defineComponent({
       } catch (error) {
         console.error("Error searching users:", error);
         this.searchResults = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async searchEditUsers() {
+      if (this.editSearch.trim().length < 2) {
+        this.editSearchResults = [];
+        return;
+      }
+
+      try {
+        this.loading = true;
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        const response = await API.get(`/users?q=${this.editSearch}`);
+
+        this.editSearchResults = response.data.result || [];
+      } catch (error) {
+        console.error("Error searching users:", error);
+        this.editSearchResults = [];
       } finally {
         this.loading = false;
       }
@@ -648,6 +802,127 @@ export default defineComponent({
 
     removeContributor(index: number) {
       this.selectedContributors.splice(index, 1);
+    },
+
+    addEditContributor(user: User) {
+      const exists = this.editContributors.some((c) => c._id === user._id);
+      if (!exists) {
+        this.editContributors.push(user);
+      }
+      this.editSearch = "";
+      this.editSearchResults = [];
+    },
+
+    removeEditContributor(index: number) {
+      this.editContributors.splice(index, 1);
+    },
+
+    async openEditModal(taskId: string) {
+      this.currentTaskId = taskId;
+      this.errors = {};
+      this.errorMessage = "";
+
+      try {
+        this.loading = true;
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        // Fetch task details
+        const response = await API.get(`/task/${taskId}`);
+        const taskData = response.data;
+
+        // Log the task data to see its structure
+        console.log("Task data:", taskData);
+
+        const formatDate = (timestamp: number): string => {
+          const date = new Date(timestamp);
+          return date.toISOString().split("T")[0];
+        };
+
+        // Populate edit form with task data
+        this.editForm.name = taskData.name;
+        this.editForm.description = taskData.description;
+        this.editForm.start_date = formatDate(taskData.start_date);
+        this.editForm.end_date = formatDate(taskData.end_date);
+        this.editForm.project_id = taskData.project_id;
+        this.editForm.type = taskData.type || "progress";
+
+        // Fetch project details if available
+        if (taskData.project_id) {
+          const projectResponse = await API.get(
+            `/project/${taskData.project_id}`
+          );
+          this.editProjectName = projectResponse.data.name || "Unknown Project";
+        } else {
+          this.editProjectName = "No Project Assigned";
+        }
+
+        // Clear previous contributors
+        this.editContributors = [];
+
+        // Check both 'contributor' and 'contributors' properties
+        const contributorIds =
+          taskData.contributor || taskData.contributors || [];
+
+        console.log("Contributor IDs found:", contributorIds);
+
+        // Make sure contributorIds is treated as an array
+        const contributorIdsArray = Array.isArray(contributorIds)
+          ? contributorIds
+          : contributorIds.split(",").filter((id) => id.trim());
+
+        if (contributorIdsArray.length > 0) {
+          console.log("Processing contributor IDs:", contributorIdsArray);
+
+          // Create an array of promises for fetching user details
+          const contributorPromises = contributorIdsArray.map(
+            async (contributorId) => {
+              try {
+                console.log(`Fetching user details for ID: ${contributorId}`);
+                const userResponse = await API.get(`/user/${contributorId}`);
+                console.log(`User data received:`, userResponse.data);
+                return userResponse.data;
+              } catch (error) {
+                console.error(
+                  `Error fetching contributor ${contributorId}:`,
+                  error
+                );
+                return null;
+              }
+            }
+          );
+
+          // Wait for all promises to resolve
+          const contributors = await Promise.all(contributorPromises);
+
+          // Filter out any null values (failed requests) and add to editContributors
+          this.editContributors = contributors.filter((c) => c !== null);
+          console.log("Final contributors loaded:", this.editContributors);
+        }
+
+        // Show the edit modal
+        const modalElement = document.getElementById("editTaskModal");
+        if (modalElement) {
+          const modal = new Modal(modalElement);
+          modal.show();
+        }
+      } catch (error) {
+        console.error("Error fetching task details:", error);
+        this.errorMessage = "Failed to load task details";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    openDeleteModal(taskId: string) {
+      this.currentTaskId = taskId;
+
+      const modalElement = document.getElementById("deleteTaskModal");
+      if (modalElement) {
+        const modal = new Modal(modalElement);
+        modal.show();
+      }
     },
 
     async submitTask() {
@@ -715,21 +990,107 @@ export default defineComponent({
       }
     },
 
-    resetForm() {
-      this.taskForm.name = "";
-      this.taskForm.description = "";
-      this.taskForm.start_date = "";
-      this.taskForm.end_date = "";
-      this.taskForm.project_id = "";
-      this.taskForm.type = "progress";
-      this.selectedContributors = [];
-      this.selectedProject = null;
-      this.projectSearch = "";
-      this.search = "";
-      this.searchResults = [];
-      this.projectResults = [];
-      this.errors = {};
-      this.errorMessage = "";
+    async updateTask() {
+      try {
+        this.loading = true;
+        this.errors = {};
+        this.errorMessage = "";
+
+        if (!this.currentTaskId) {
+          this.errorMessage = "Task ID is missing";
+          return;
+        }
+
+        const startDate = new Date(this.editForm.start_date).getTime();
+        const endDate = new Date(this.editForm.end_date).getTime();
+
+        // Extract only the IDs from the contributor objects
+        const contributorIds = this.editContributors
+          .map((c) => c._id)
+          .join(",");
+
+        const payload = {
+          name: this.editForm.name,
+          description: this.editForm.description,
+          start_date: startDate,
+          end_date: endDate,
+          type: this.editForm.type,
+          contributor: contributorIds, // Send only the IDs
+        };
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        await API.put(`/task/${this.currentTaskId}`, payload);
+
+        const modalElement = document.getElementById("editTaskModal");
+        if (modalElement) {
+          const modalInstance = Modal.getInstance(modalElement as Element);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+
+        this.fetchData();
+        this.resetEditForm();
+      } catch (error) {
+        if (error instanceof Error && "response" in error) {
+          const response = (
+            error as { response: { status: number; data: any } }
+          ).response;
+
+          if (response.status !== 200) {
+            const data = response.data;
+
+            if (typeof data.message === "string") {
+              this.errorMessage = data.message;
+            }
+
+            if (Array.isArray(data.errors)) {
+              data.errors.forEach((err: { field: string; message: string }) => {
+                this.errors[err.field] = err.message;
+              });
+            }
+          }
+        } else {
+          console.error("Unexpected error during update:", error);
+          this.errorMessage = "Failed to update task";
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteTask() {
+      try {
+        this.loading = true;
+
+        if (!this.currentTaskId) {
+          this.errorMessage = "Task ID is missing";
+          return;
+        }
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        await API.delete(`/task/${this.currentTaskId}`);
+
+        const modalElement = document.getElementById("deleteTaskModal");
+        if (modalElement) {
+          const modalInstance = Modal.getInstance(modalElement as Element);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+
+        this.fetchData();
+        this.currentTaskId = "";
+      } catch (error) {
+        console.error("Error deleting task:", error);
+        this.errorMessage = "Failed to delete task";
+      } finally {
+        this.loading = false;
+      }
     },
 
     async fetchData() {
@@ -753,6 +1114,27 @@ export default defineComponent({
         }
       } catch (error) {
         console.error("Error fetching tasks:", error);
+      }
+    },
+
+    async toggleTaskStatus(taskId: string, isDone: boolean) {
+      try {
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        const status = isDone ? "done" : "progress";
+
+        await API.put(`/task/${taskId}`, {
+          type: status,
+        });
+
+        const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
+        if (taskIndex !== -1) {
+          this.tasks[taskIndex].type = status;
+        }
+      } catch (error) {
+        console.error("Error updating task status:", error);
+        this.fetchData();
       }
     },
   },
