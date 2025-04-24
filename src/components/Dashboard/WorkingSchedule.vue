@@ -371,6 +371,11 @@ export default defineComponent({
   },
   mounted() {
     this.fetchSchedules();
+
+    const modalElement = document.getElementById("addScheduleModal");
+    if (modalElement) {
+      modalElement.addEventListener("hidden.bs.modal", this.resetForm);
+    }
   },
   methods: {
     async fetchSchedules() {

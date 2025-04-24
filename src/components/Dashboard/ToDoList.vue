@@ -37,7 +37,7 @@
           <div class="form-check mb-0 fs-md-15 fs-lg-16 text-black fw-medium">
             <input
               :id="'task' + task._id"
-              :checked="task.type === 'done'"
+              :checked="task.status === 'completed'"
               class="form-check-input shadow-none"
               type="checkbox"
               @change="toggleTaskStatus(task._id, $event.target.checked)"
@@ -56,15 +56,6 @@
               <i class="flaticon-dots"></i>
             </button>
             <ul class="dropdown-menu">
-              <li>
-                <a
-                  class="dropdown-item d-flex align-items-center"
-                  href="javascript:void(0);"
-                >
-                  <i class="flaticon-view lh-1 me-8"></i>
-                  View
-                </a>
-              </li>
               <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
@@ -264,21 +255,23 @@
               </div>
             </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="taskType">Status</label>
+              <label class="form-label fw-medium" for="taskStatus"
+                >Status</label
+              >
               <select
-                id="taskType"
-                v-model="taskForm.type"
-                :class="{ 'is-invalid': errors.type }"
+                id="taskStatus"
+                v-model="taskForm.status"
+                :class="{ 'is-invalid': errors.status }"
                 class="form-select shadow-none text-black fs-md-15"
                 disabled
               >
-                <option value="progress">Progress</option>
+                <option value="active">Active</option>
                 <option value="testing">Testing</option>
-                <option value="done">Done</option>
-                <option value="canceled">Canceled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
-              <div v-if="errors.type" class="invalid-feedback">
-                {{ errors.type }}
+              <div v-if="errors.status" class="invalid-feedback">
+                {{ errors.status }}
               </div>
             </div>
           </form>
@@ -455,22 +448,22 @@
               </div>
             </div>
             <div class="mb-mb-15 mb-md-20">
-              <label class="form-label fw-medium" for="editTaskType"
+              <label class="form-label fw-medium" for="editTaskStatus"
                 >Status</label
               >
               <select
-                id="editTaskType"
-                v-model="editForm.type"
-                :class="{ 'is-invalid': errors.type }"
+                id="editTaskStatus"
+                v-model="editForm.status"
+                :class="{ 'is-invalid': errors.status }"
                 class="form-select shadow-none text-black fs-md-15"
               >
-                <option value="progress">Progress</option>
+                <option value="active">Active</option>
                 <option value="testing">Testing</option>
-                <option value="done">Done</option>
-                <option value="canceled">Canceled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
-              <div v-if="errors.type" class="invalid-feedback">
-                {{ errors.type }}
+              <div v-if="errors.status" class="invalid-feedback">
+                {{ errors.status }}
               </div>
             </div>
           </form>
@@ -548,7 +541,7 @@ interface TaskForm {
   start_date: string;
   end_date: string;
   project_id: string;
-  type: string;
+  status: string;
 }
 
 export default defineComponent({
@@ -585,7 +578,7 @@ export default defineComponent({
       start_date: "",
       end_date: "",
       project_id: "",
-      type: "progress",
+      status: "active",
     });
     const editProjectName = ref("");
     const editSearch = ref("");
@@ -598,7 +591,7 @@ export default defineComponent({
       start_date: "",
       end_date: "",
       project_id: "",
-      type: "progress",
+      status: "active",
     });
 
     const fetchData = async () => {
@@ -654,7 +647,7 @@ export default defineComponent({
       taskForm.start_date = "";
       taskForm.end_date = "";
       taskForm.project_id = "";
-      taskForm.type = "progress";
+      taskForm.status = "active";
       selectedContributors.value = [];
       selectedProject.value = null;
       projectSearch.value = "";
@@ -669,7 +662,7 @@ export default defineComponent({
       editForm.start_date = "";
       editForm.end_date = "";
       editForm.project_id = "";
-      editForm.type = "progress";
+      editForm.status = "active";
       editContributors.value = [];
       editProjectName.value = "";
       editSearch.value = "";
@@ -679,8 +672,8 @@ export default defineComponent({
 
     const sortedTasks = computed(() => {
       return [...tasks.value].sort((a, b) => {
-        if (a.type === "done" && b.type !== "done") return 1;
-        if (a.type !== "done" && b.type === "done") return -1;
+        if (a.status === "completed" && b.status !== "completed") return 1;
+        if (a.status !== "completed" && b.status === "completed") return -1;
 
         return (
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -846,7 +839,7 @@ export default defineComponent({
         this.editForm.start_date = formatDate(taskData.start_date);
         this.editForm.end_date = formatDate(taskData.end_date);
         this.editForm.project_id = taskData.project_id;
-        this.editForm.type = taskData.type || "progress";
+        this.editForm.status = taskData.status || "active";
 
         // Fetch project details if available
         if (taskData.project_id) {
@@ -943,7 +936,7 @@ export default defineComponent({
           description: this.taskForm.description,
           start_date: startDate,
           end_date: endDate,
-          type: this.taskForm.type,
+          status: this.taskForm.status,
           contributor: contributorIds,
           project_id: this.taskForm.project_id,
         };
@@ -1004,7 +997,6 @@ export default defineComponent({
         const startDate = new Date(this.editForm.start_date).getTime();
         const endDate = new Date(this.editForm.end_date).getTime();
 
-        // Extract only the IDs from the contributor objects
         const contributorIds = this.editContributors
           .map((c) => c._id)
           .join(",");
@@ -1014,8 +1006,8 @@ export default defineComponent({
           description: this.editForm.description,
           start_date: startDate,
           end_date: endDate,
-          type: this.editForm.type,
-          contributor: contributorIds, // Send only the IDs
+          status: this.editForm.status,
+          contributor: contributorIds,
         };
 
         const token = localStorage.getItem("jwt");
@@ -1122,15 +1114,15 @@ export default defineComponent({
         const token = localStorage.getItem("jwt");
         setAuthToken(token);
 
-        const status = isDone ? "done" : "progress";
+        const status = isDone ? "completed" : "active";
 
         await API.put(`/task/${taskId}`, {
-          type: status,
+          status: status,
         });
 
         const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
         if (taskIndex !== -1) {
-          this.tasks[taskIndex].type = status;
+          this.tasks[taskIndex].status = status;
         }
       } catch (error) {
         console.error("Error updating task status:", error);
