@@ -1,8 +1,8 @@
 <template>
   <div class="card mb-25 border-0 rounded-0 bg-white">
     <div
-      class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing"
       :style="{ height: isLoaded ? '500px' : '500px' }"
+      class="card-body p-15 p-sm-20 p-md-25 p-lg-30 letter-spacing"
     >
       <div
         class="mb-15 mb-md-25 d-sm-flex align-items-center justify-content-between"
@@ -19,8 +19,8 @@
         </div>
         <loader-component v-if="isLoading" style="margin: 10% auto" />
         <table
-          class="table text-nowrap align-middle mb-0"
           v-if="isLoaded && projects.length"
+          class="table text-nowrap align-middle mb-0"
         >
           <thead>
             <tr>
@@ -65,12 +65,17 @@
                   <img
                     v-if="project.logo"
                     :src="project.logo"
-                    width="37"
-                    height="37"
-                    class="rounded-1 me-10"
                     alt="project-image"
+                    class="rounded-1 me-10"
+                    height="37"
+                    width="37"
                   />
-                  <span class="d-block">{{ project.name }}</span>
+                  <router-link
+                    class="d-block text-decoration-none text-black"
+                    to="/project"
+                  >
+                    <span class="d-block">{{ project.name }}</span>
+                  </router-link>
                 </div>
               </th>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
@@ -84,15 +89,15 @@
               </td>
               <td class="shadow-none lh-1 fw-medium text-body-tertiary">
                 <div
+                  :aria-valuenow="getProgress(project)"
+                  aria-valuemax="100"
+                  aria-valuemin="0"
                   class="progress"
                   role="progressbar"
-                  :aria-valuenow="getProgress(project)"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
                 >
                   <div
-                    class="progress-bar"
                     :style="{ width: getProgress(project) + '%' }"
+                    class="progress-bar"
                   ></div>
                 </div>
               </td>
@@ -115,23 +120,23 @@
         <p class="mb-0 text-paragraph"></p>
         <nav class="mt-15 mt-md-0">
           <ul class="pagination mb-0">
-            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <li :class="{ disabled: currentPage === 1 }" class="page-item">
               <button class="page-link" @click="changePage(currentPage - 1)">
                 <i class="flaticon-chevron-1"></i>
               </button>
             </li>
             <li v-for="page in totalPages" :key="page" class="page-item">
               <button
-                class="page-link"
                 :class="{ active: currentPage === page }"
+                class="page-link"
                 @click="changePage(page)"
               >
                 {{ page }}
               </button>
             </li>
             <li
-              class="page-item"
               :class="{ disabled: currentPage === totalPages }"
+              class="page-item"
             >
               <button class="page-link" @click="changePage(currentPage + 1)">
                 <i class="flaticon-chevron"></i>

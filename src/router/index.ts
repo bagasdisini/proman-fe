@@ -8,6 +8,8 @@ import CalendarPage from "@/pages/Dashboard/CalendarPage.vue";
 import MemberList from "@/pages/Dashboard/MemberListPage.vue";
 import TaskList from "@/pages/Dashboard/TaskListPage.vue";
 import ProjectsList from "@/pages/Dashboard/ProjectListPage.vue";
+import ProjectDetailPage from "@/pages/Dashboard/ProjectDetailPage.vue";
+import ProjectCreatePage from "@/pages/Dashboard/ProjectCreatePage.vue";
 import ProfileSettings from "@/pages/User/ChangeProfilePage.vue";
 import ChangePassword from "@/pages/User/ChangePasswordPage.vue";
 
@@ -44,6 +46,18 @@ const routes = [
     path: "/project-list",
     name: "ProjectListPage",
     component: ProjectsList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/project",
+    name: "ProjectDetailPage",
+    component: ProjectDetailPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/create-new-project",
+    name: "ProjectCreatePage",
+    component: ProjectCreatePage,
     meta: { requiresAuth: true },
   },
   {

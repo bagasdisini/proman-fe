@@ -99,7 +99,7 @@
                   />
                   <router-link
                     class="d-block text-decoration-none text-black"
-                    to="/project-details"
+                    to="/project"
                   >
                     <span class="d-block">{{ project.name }}</span>
                   </router-link>
