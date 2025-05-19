@@ -825,9 +825,6 @@ export default defineComponent({
         const response = await API.get(`/task/${taskId}`);
         const taskData = response.data;
 
-        // Log the task data to see its structure
-        console.log("Task data:", taskData);
-
         const formatDate = (timestamp: number): string => {
           const date = new Date(timestamp);
           return date.toISOString().split("T")[0];
@@ -857,8 +854,6 @@ export default defineComponent({
         // Check both 'contributor' and 'contributors' properties
         const contributorIds =
           taskData.contributor || taskData.contributors || [];
-
-        console.log("Contributor IDs found:", contributorIds);
 
         // Make sure contributorIds is treated as an array
         const contributorIdsArray = Array.isArray(contributorIds)

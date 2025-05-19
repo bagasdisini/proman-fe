@@ -103,7 +103,7 @@
                 {{ user.phone }}
               </td>
               <td class="shadow-none lh-1 fw-medium text-muted">
-                {{ user.position }}
+                {{ toTitleCase(user.position) }}
               </td>
               <td class="shadow-none lh-1 fw-medium text-muted">
                 {{ formatDate(user.created_at) }}
@@ -215,6 +215,14 @@ export default defineComponent({
       formatDate,
       changePage,
     };
+  },
+  methods: {
+    toTitleCase(str) {
+      return str.replace(
+        /\w\S*/g,
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
+    },
   },
 });
 </script>

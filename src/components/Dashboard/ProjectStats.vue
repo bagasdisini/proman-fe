@@ -79,7 +79,7 @@
                 </div>
               </th>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
-                {{ project.type }}
+                {{ toTitleCase(project.type) }}
               </td>
               <td class="shadow-none lh-1 fw-bold text-body-tertiary">
                 {{ formatDate(project.start_date) }}
@@ -104,7 +104,7 @@
               <td class="shadow-none lh-1 fw-medium">
                 <span
                   :class="['badge fs-13', getStatusClass(project.status)]"
-                  >{{ project.status }}</span
+                  >{{ toTitleCase(project.status) }}</span
                 >
               </td>
             </tr>
@@ -237,6 +237,14 @@ export default defineComponent({
       getStatusClass,
       changePage,
     };
+  },
+  methods: {
+    toTitleCase(str) {
+      return str.replace(
+        /\w\S*/g,
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
+    },
   },
 });
 </script>

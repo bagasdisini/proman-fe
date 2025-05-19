@@ -52,6 +52,7 @@
           v-else
           :key="schedule.id"
           class="list-item pt-15 bg-f2f1f9 pb-15 pt-md-20 pb-md-20 ps-20 pe-15 position-relative d-sm-flex justify-content-between align-items-center"
+          @click="openCurrentSchedule(schedule.id)"
         >
           <div class="content">
             <div class="d-flex align-items-center mb-5">
@@ -288,10 +289,227 @@
       </div>
     </div>
   </div>
+  <div
+    id="viewScheduleModal"
+    aria-hidden="true"
+    class="modal fade"
+    tabindex="-1"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header me-md-20 ms-md-20">
+          <h1 class="modal-title fs-5">Detail Schedule</h1>
+          <button
+            aria-label="Close"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            type="button"
+          ></button>
+        </div>
+        <div class="modal-body me-md-20 ms-md-20">
+          <form>
+            <div
+              v-if="errorMessage"
+              class="alert alert-danger alert-dismissible d-flex align-items-center fs-md-15 fs-lg-16"
+              role="alert"
+            >
+              <i
+                class="flaticon-warning lh-1 fs-20 position-relative top-1 me-8"
+              ></i>
+              <span>{{ errorMessage }}</span>
+              <button
+                aria-label="Close"
+                class="btn-close shadow-none"
+                type="button"
+                @click="errorMessage = ''"
+              ></button>
+            </div>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="titleTask">Title</label>
+              <input
+                id="titleTask"
+                v-model="currentScheduleForm.name"
+                :class="{ 'is-invalid': errors.name }"
+                class="form-control shadow-none text-black fs-md-15 fs-lg-16"
+                disabled
+                type="text"
+              />
+              <div v-if="errors.name" class="invalid-feedback">
+                {{ errors.name }}
+              </div>
+            </div>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="descTask"
+                >Description</label
+              >
+              <textarea
+                id="descTask"
+                v-model="currentScheduleForm.description"
+                :class="{ 'is-invalid': errors.description }"
+                class="form-control shadow-none fs-md-15 text-black"
+                disabled
+                rows="3"
+              ></textarea>
+              <div v-if="errors.description" class="invalid-feedback">
+                {{ errors.description }}
+              </div>
+            </div>
+            <div class="mb-15 mb-md-20 row">
+              <div class="col-md-6">
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="startDate"
+                    >Start Date</label
+                  >
+                  <input
+                    id="startDate"
+                    v-model="currentScheduleForm.start_date"
+                    :class="{ 'is-invalid': errors.start_date }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    disabled
+                    type="date"
+                  />
+                  <div v-if="errors.start_date" class="invalid-feedback">
+                    {{ errors.start_date }}
+                  </div>
+                </div>
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="startTime"
+                    >Start Time</label
+                  >
+                  <input
+                    id="startTime"
+                    v-model="currentScheduleForm.start_time"
+                    :class="{ 'is-invalid': errors.start_time }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    disabled
+                    type="time"
+                  />
+                  <div v-if="errors.start_time" class="invalid-feedback">
+                    {{ errors.start_time }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="endDate"
+                    >End Date</label
+                  >
+                  <input
+                    id="endDate"
+                    v-model="currentScheduleForm.end_date"
+                    :class="{ 'is-invalid': errors.end_date }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    disabled
+                    type="date"
+                  />
+                  <div v-if="errors.end_date" class="invalid-feedback">
+                    {{ errors.end_date }}
+                  </div>
+                </div>
+                <div class="form-group mb-15 mb-sm-20 mb-md-25">
+                  <label
+                    class="d-block text-black fw-semibold mb-10"
+                    for="endTime"
+                    >End Time</label
+                  >
+                  <input
+                    id="endTime"
+                    v-model="currentScheduleForm.end_time"
+                    :class="{ 'is-invalid': errors.end_time }"
+                    class="form-control shadow-none text-black fs-md-15"
+                    disabled
+                    type="time"
+                  />
+                  <div v-if="errors.end_time" class="invalid-feedback">
+                    {{ errors.end_time }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium">Contributors</label>
+              <div class="selected-contributors mb-2">
+                <span
+                  v-for="contributor in currentContributors"
+                  :key="contributor._id"
+                  class="selected-contributor"
+                >
+                  {{ contributor.name }}
+                </span>
+              </div>
+              <div class="input-group">
+                <input
+                  v-model="search"
+                  :class="{ 'is-invalid': errors.contributor }"
+                  class="form-control fs-md-15 text-black shadow-none"
+                  disabled
+                  placeholder="Type to search users..."
+                  @input="searchUsers"
+                />
+                <div v-if="errors.contributor" class="invalid-feedback">
+                  {{ errors.contributor }}
+                </div>
+              </div>
+              <div
+                v-if="searchResults.length > 0 && search !== ''"
+                class="dropdown-menu show w-100"
+              >
+                <div
+                  v-for="user in searchResults"
+                  :key="user._id"
+                  class="dropdown-item"
+                  @click="addContributor(user)"
+                >
+                  {{ user.name }} ({{ user.email }})
+                </div>
+              </div>
+            </div>
+            <div class="mb-15 mb-md-20">
+              <label class="form-label fw-medium" for="scheduleType"
+                >Type</label
+              >
+              <select
+                id="scheduleType"
+                v-model="currentScheduleForm.type"
+                :class="{ 'is-invalid': errors.type }"
+                class="form-select shadow-none text-black fs-md-15"
+                disabled
+              >
+                <option value="meeting">Meeting</option>
+                <option value="discussion">Discussion</option>
+                <option value="review">Review</option>
+                <option value="presentation">Presentation</option>
+                <option value="etc">Etc</option>
+              </select>
+              <div v-if="errors.type" class="invalid-feedback">
+                {{ errors.type }}
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer me-md-20 ms-md-20">
+          <button
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            type="button"
+            @click="resetForm"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import LoaderComponent from "@/components/Layouts/Loader.vue";
 import { API, setAuthToken } from "@/api";
 import { Modal } from "bootstrap";
@@ -330,6 +548,9 @@ export default defineComponent({
     let schedules = ref([]);
     let scheduleCounts = ref({});
 
+    const currentScheduleId = ref<string>("");
+    const currentContributors = ref<string[]>([]);
+
     const search = ref("");
     const searchResults = ref<User[]>([]);
     const selectedContributors = ref<User[]>([]);
@@ -345,6 +566,17 @@ export default defineComponent({
       type: "meeting",
     });
 
+    const currentScheduleForm = reactive<ScheduleForm>({
+      name: "",
+      description: "",
+      start_date: "",
+      start_time: "",
+      end_date: "",
+      end_time: "",
+      type: "meeting",
+    });
+    const editContributors = ref<User[]>([]);
+
     const getDates = () => {
       const now = new Date();
       let dates: Date[] = [];
@@ -355,6 +587,27 @@ export default defineComponent({
       }
       return dates;
     };
+
+    const resetDefaultForm = () => {
+      scheduleForm.name = "";
+      scheduleForm.description = "";
+      scheduleForm.start_date = "";
+      scheduleForm.start_time = "";
+      scheduleForm.end_date = "";
+      scheduleForm.end_time = "";
+      scheduleForm.type = "meeting";
+      selectedContributors.value = [];
+    };
+
+    onMounted(() => {
+      const addScheduleModal = document.getElementById("addScheduleModal");
+
+      if (addScheduleModal) {
+        addScheduleModal.addEventListener("hidden.bs.modal", () => {
+          resetDefaultForm();
+        });
+      }
+    });
 
     return {
       isLoading,
@@ -367,6 +620,10 @@ export default defineComponent({
       schedules,
       scheduleCounts,
       dates: getDates(),
+      currentScheduleId,
+      currentScheduleForm,
+      currentContributors,
+      editContributors,
     };
   },
   mounted() {
@@ -375,6 +632,11 @@ export default defineComponent({
     const modalElement = document.getElementById("addScheduleModal");
     if (modalElement) {
       modalElement.addEventListener("hidden.bs.modal", this.resetForm);
+    }
+
+    const viewScheduleModal = document.getElementById("viewScheduleModal");
+    if (viewScheduleModal) {
+      viewScheduleModal.addEventListener("hidden.bs.modal", this.resetForm);
     }
   },
   methods: {
@@ -433,6 +695,80 @@ export default defineComponent({
         this.isLoading = false;
         this.isLoaded = true;
       }, remainingTime);
+    },
+
+    async openCurrentSchedule(scheduleId: string) {
+      this.currentScheduleId = scheduleId;
+      this.errors = {};
+      this.errorMessage = "";
+
+      try {
+        this.loading = true;
+
+        const token = localStorage.getItem("jwt");
+        setAuthToken(token);
+
+        const response = await API.get(`/schedule/${scheduleId}`);
+        const scheduleData = response.data;
+
+        const formatDate = (timestamp: number): string => {
+          const date = new Date(timestamp);
+          return date.toISOString().split("T")[0];
+        };
+
+        this.currentScheduleForm.name = scheduleData.name;
+        this.currentScheduleForm.description = scheduleData.description;
+        this.currentScheduleForm.start_date = formatDate(
+          scheduleData.start_date
+        );
+        this.currentScheduleForm.start_time = scheduleData.start_time;
+        this.currentScheduleForm.end_date = formatDate(scheduleData.end_date);
+        this.currentScheduleForm.end_time = scheduleData.end_time;
+        this.currentScheduleForm.type = scheduleData.type;
+
+        this.currentContributors = [];
+
+        const contributorIds =
+          scheduleData.contributor || scheduleData.contributors || [];
+
+        const contributorIdsArray = Array.isArray(contributorIds)
+          ? contributorIds
+          : contributorIds.split(",").filter((id) => id.trim());
+
+        if (contributorIdsArray.length > 0) {
+          console.log("Processing contributor IDs:", contributorIdsArray);
+
+          const contributorPromises = contributorIdsArray.map(
+            async (contributorId) => {
+              try {
+                const userResponse = await API.get(`/user/${contributorId}`);
+                return userResponse.data;
+              } catch (error) {
+                console.error(
+                  `Error fetching contributor ${contributorId}:`,
+                  error
+                );
+                return null;
+              }
+            }
+          );
+
+          const contributors = await Promise.all(contributorPromises);
+
+          this.currentContributors = contributors.filter((c) => c !== null);
+        }
+
+        const modalElement = document.getElementById("viewScheduleModal");
+        if (modalElement) {
+          const modal = new Modal(modalElement);
+          modal.show();
+        }
+      } catch (error) {
+        console.error("Error fetching schedule details:", error);
+        this.errorMessage = "Failed to load schedule details";
+      } finally {
+        this.loading = false;
+      }
     },
 
     isToday(date) {
