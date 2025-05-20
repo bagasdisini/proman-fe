@@ -19,15 +19,13 @@
         </form>
       </div>
       <div class="d-sm-flex align-items-center">
-        <a
+        <router-link
           class="default-btn position-relative transition border-0 fw-medium text-white pt-11 pb-11 ps-25 pe-25 pt-md-12 pb-md-12 ps-md-30 pe-md-30 rounded-1 bg-success fs-md-15 fs-lg-16 d-inline-block me-10 mb-10 mb-lg-0 text-decoration-none"
-          data-bs-target="#createNewUserModal"
-          data-bs-toggle="modal"
-          href="#"
+          to="/add-user"
         >
           Add New User
           <i class="flaticon-plus position-relative ms-5 fs-12"></i>
-        </a>
+        </router-link>
       </div>
     </div>
     <div class="card-body p-15 p-sm-20 p-md-25">
@@ -53,12 +51,12 @@
               >
                 PHONE
               </th>
-              <thf
+              <th
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
                 scope="col"
               >
                 POSITION
-              </thf>
+              </th>
               <th
                 class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0"
                 scope="col"
@@ -72,9 +70,11 @@
                 PROJECTS
               </th>
               <th
-                class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 pt-0 text-end pe-0"
+                class="text-uppercase fw-medium shadow-none text-body-tertiary fs-13 text-center"
                 scope="col"
-              ></th>
+              >
+                ACTIONS
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -112,8 +112,40 @@
                 {{ user.total_project }}
               </td>
               <td
-                class="shadow-none lh-1 fw-medium text-body-tertiary text-end pe-0"
-              ></td>
+                class="shadow-none lh-1 fw-medium text-body-tertiary text-center"
+              >
+                <div class="dropdown">
+                  <button
+                    aria-expanded="false"
+                    class="dropdown-toggle bg-transparent border-0 shadow-none p-0 transition"
+                    data-bs-toggle="dropdown"
+                    type="button"
+                  >
+                    <i class="flaticon-dots"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <a
+                        :href="'/update-user/'"
+                        class="dropdown-item d-flex align-items-center"
+                      >
+                        <i class="flaticon-pen lh-1 me-8"></i>
+                        Edit
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item d-flex align-items-center"
+                        href="javascript:void(0);"
+                        @click="openDeleteModal(user._id)"
+                      >
+                        <i class="flaticon-delete lh-1 me-8"></i>
+                        Delete
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -153,11 +185,44 @@
       </div>
     </div>
   </div>
+  <div id="deleteUserModal" aria-hidden="true" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header me-md-20 ms-md-20">
+          <h1 class="modal-title fs-5">Delete User</h1>
+          <button
+            aria-label="Close"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            type="button"
+          ></button>
+        </div>
+        <div class="modal-body me-md-20 ms-md-20">
+          <span style="font-size: large"
+            >Are you sure you want to delete this user?</span
+          >
+        </div>
+        <div class="modal-footer me-md-20 ms-md-20">
+          <button
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            type="button"
+          >
+            Close
+          </button>
+          <button class="btn btn-danger" type="button" @click="deleteUser">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import { API, setAuthToken } from "@/api";
+import { Modal } from "bootstrap";
 
 export default defineComponent({
   name: "MemberList",
@@ -222,6 +287,14 @@ export default defineComponent({
         /\w\S*/g,
         (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       );
+    },
+
+    openDeleteModal(taskId: string) {
+      const modalElement = document.getElementById("deleteUserModal");
+      if (modalElement) {
+        const modal = new Modal(modalElement);
+        modal.show();
+      }
     },
   },
 });

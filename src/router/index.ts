@@ -12,6 +12,8 @@ import ProjectDetailPage from "@/pages/Dashboard/ProjectDetailPage.vue";
 import ProjectCreatePage from "@/pages/Dashboard/ProjectCreatePage.vue";
 import ProfileSettings from "@/pages/User/ChangeProfilePage.vue";
 import ChangePassword from "@/pages/User/ChangePasswordPage.vue";
+import AddUser from "@/pages/User/AddUser.vue";
+import UpdateUser from "@/pages/User/UpdateUser.vue";
 
 const routes = [
   {
@@ -88,6 +90,18 @@ const routes = [
     path: "/change-password",
     name: "ChangePassword",
     component: ChangePassword,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/add-user",
+    name: "AddUser",
+    component: AddUser,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/update-user",
+    name: "UpdateUser",
+    component: UpdateUser,
     meta: { requiresAuth: true },
   },
 ];
